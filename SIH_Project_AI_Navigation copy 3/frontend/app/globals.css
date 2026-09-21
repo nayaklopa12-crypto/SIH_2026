@@ -1,0 +1,211 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  /* Polar operations console palette — single deliberate token set.
+     bg/panel/raised navy · glacier-white ice · cyan + ice-blue accents ·
+     amber = moderate risk only, red = high risk only (never decorative). */
+  --bg-raised: #101c29;
+  --background: #04070c;
+  --foreground: #eef3f7;
+  --card: #0b131c;
+  --card-foreground: #eef3f7;
+  --popover: #0b131c;
+  --popover-foreground: #eef3f7;
+  --primary: #3fd0e0;
+  --primary-foreground: #04070c;
+  --secondary: #101c29;
+  --secondary-foreground: #eef3f7;
+  --muted: #101c29;
+  --muted-foreground: rgba(238, 243, 247, 0.6);
+  --accent: #101c29;
+  --accent-foreground: #eef3f7;
+  --accent-2: #7fb8ff;
+  --hazard: #ffb347;
+  --danger: #ff5c5c;
+  --destructive: #ff5c5c;
+  --destructive-foreground: #04070c;
+  --border: rgba(238, 243, 247, 0.12);
+  --input: #101c29;
+  --ring: #3fd0e0;
+  --chart-1: #3fd0e0;
+  --chart-2: #7fb8ff;
+  --chart-3: #eef3f7;
+  --chart-4: #ffb347;
+  --chart-5: #ff5c5c;
+  --sidebar: #0b131c;
+  --sidebar-foreground: #eef3f7;
+  --sidebar-primary: #3fd0e0;
+  --sidebar-primary-foreground: #04070c;
+  --sidebar-accent: #101c29;
+  --sidebar-accent-foreground: #eef3f7;
+  --sidebar-border: rgba(238, 243, 247, 0.12);
+  --sidebar-ring: #3fd0e0;
+}
+
+@theme inline {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --color-bg-raised: var(--bg-raised);
+  --color-accent-2: var(--accent-2);
+  --color-hazard: var(--hazard);
+  --color-danger: var(--danger);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* --- Polar operations console motifs --- */
+
+/* Ambient Three.js ice field lives behind everything (public/ice-field.mjs). */
+#ice-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* App content sits above the ambient canvas. */
+body > main,
+body > .app-shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Base navy fill; the ice-field canvas paints its own faint aurora on top and
+   shows through the translucent glass panels at the gutters only. */
+.polar-bg {
+  background-color: #04070c;
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(63, 208, 224, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(127, 184, 255, 0.05), transparent 55%);
+}
+
+/* Frosted-glass panel: translucent + backdrop blur + thin icy border. */
+.glass {
+  background: rgba(11, 19, 28, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 0 1px rgba(63, 208, 224, 0.18), 0 0 24px rgba(63, 208, 224, 0.12);
+}
+
+/* Numeric telemetry readouts render in mono with lined-up tabular figures. */
+.readout,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Slow pulse for live iceberg hazard markers (~2s loop). */
+@keyframes iceberg-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+.iceberg-pulse {
+  animation: iceberg-pulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Leaflet marker pulse (applied to a div icon). */
+.leaflet-iceberg-pulse {
+  border-radius: 9999px;
+  background: rgba(255, 92, 92, 0.9);
+  box-shadow: 0 0 0 rgba(255, 92, 92, 0.6);
+  animation: leaflet-berg 2s ease-out infinite;
+}
+@keyframes leaflet-berg {
+  0% { box-shadow: 0 0 0 0 rgba(255, 92, 92, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(255, 92, 92, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 92, 92, 0); }
+}
+
+/* Progressive route-line draw. */
+@keyframes route-draw {
+  to { stroke-dashoffset: 0; }
+}

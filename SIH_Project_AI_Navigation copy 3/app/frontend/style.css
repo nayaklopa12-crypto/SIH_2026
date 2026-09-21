@@ -22,7 +22,7 @@
   --radius-lg: 18px;
   --shadow: 0 4px 24px rgba(14,165,233,0.12);
   --shadow-lg: 0 12px 40px rgba(2,132,199,0.15);
-  --font: 'Outfit', -apple-system, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
 
@@ -32,11 +32,12 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 
 /* Top Navbar */
 #top-navbar{
-  height:60px;background:var(--black);
+  min-height:60px;background:var(--black);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;z-index:1000;
+  padding:10px 20px;z-index:1000;
   border-bottom:2px solid var(--cyan);
   box-shadow:0 2px 20px rgba(14,165,233,0.25);
+  flex-wrap: wrap; gap: 10px;
 }
 .brand-group{display:flex;align-items:center;gap:12px;}
 .logo-badge{
@@ -72,21 +73,50 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;z-index:900;
   box-shadow:var(--shadow-lg);overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(14,165,233,0.3) transparent;
 }
+#sidebar-controls::-webkit-scrollbar{width:5px;}
+#sidebar-controls::-webkit-scrollbar-track{background:transparent;}
+#sidebar-controls::-webkit-scrollbar-thumb{background:rgba(14,165,233,0.25);border-radius:4px;}
+#sidebar-controls::-webkit-scrollbar-thumb:hover{background:rgba(14,165,233,0.5);}
+
 .panel-tabs{
-  display:flex;border-bottom:2px solid var(--border);
-  background:var(--bg-inset);padding:4px;gap:2px;
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom:2px solid var(--border);
+  background:var(--bg-inset);
+  padding:5px 4px;
+  gap:2px;
 }
-.tab-btn{
-  flex:1;background:transparent;border:none;outline:none;
-  color:var(--text-muted);font-family:var(--font);font-size:0.78rem;font-weight:600;
-  padding:10px 6px;border-radius:6px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:all 0.2s;
+.tab-btn { flex: 1 1 auto; min-width: 50px; }
+.tab-btn {
+  background:transparent;border:none;outline:none;
+  color:var(--text-muted);font-family:var(--font);font-size:0.69rem;font-weight:600;
+  padding:7px 2px;border-radius:6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+  white-space:nowrap;
 }
-.tab-btn i{width:14px;height:14px;}
-.tab-btn:hover{color:var(--text-primary);background:rgba(14,165,233,0.08);}
-.tab-btn.active{color:var(--blue-dark);background:rgba(14,165,233,0.15);box-shadow:inset 0 0 0 1px rgba(14,165,233,0.3);}
+.tab-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+  background:transparent;border:none;outline:none;
+  color:var(--text-muted);font-family:var(--font);font-size:0.69rem;font-weight:600;
+  padding:7px 2px;border-radius:6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+  white-space:nowrap;
+}
+.tab-btn i{width:15px;height:15px;stroke-width:2.2;}
+.tab-btn:hover{color:var(--text-primary);background:rgba(14,165,233,0.09);transform:translateY(-1px);}
+.tab-btn.active{
+  color:var(--blue-dark);background:rgba(14,165,233,0.16);
+  box-shadow:inset 0 0 0 1px rgba(14,165,233,0.35), 0 2px 6px rgba(14,165,233,0.1);
+  font-weight:700;
+}
 .tab-content{display:none;padding:16px;flex-direction:column;gap:14px;}
 .tab-content.active{display:flex;}
 
@@ -341,7 +371,506 @@ input[type=range]{width:100%;accent-color:var(--cyan);}
 /* Additional Legend Symbols */
 .legend-symbol.shipping-lane{height:3px;background:rgba(14,165,233,0.5);border:none;border-radius:2px;}
 .legend-symbol.vessel-marker{background:#1e3a5f;border-radius:2px;border:1px solid #3b82f6;}
+.legend-symbol.seaice-marker{background:rgba(56,189,248,0.25);border:1.5px dashed #0284c7;border-radius:3px;}
 
 /* Active quick-control button */
 .icon-tool-btn.active{background:rgba(14,165,233,0.2);color:var(--blue-dark);}
 
+/* ═══ SIH DEMO BUTTON & CONTROLLER HUD ═══ */
+.sih-demo-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sih-demo-btn:hover {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.8);
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+.sih-demo-btn.active {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.6);
+}
+
+.action-btn.cyan {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border-color: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.25);
+}
+.action-btn.cyan:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+}
+
+/* Floating SIH Presentation HUD - Centered Over Polar Map */
+#sih-controller-hud {
+  position: absolute;
+  bottom: 24px;
+  left: calc(430px + (100vw - 430px) / 2);
+  transform: translateX(-50%);
+  z-index: 2100;
+  width: 560px;
+  max-width: calc(100vw - 460px);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid var(--cyan);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(14, 165, 233, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slide-up 0.4s ease-out;
+}
+@keyframes slide-up {
+  from { transform: translate(-50%, 40px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.sih-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 6px;
+}
+.sih-hud-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sih-hud-step-count {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.sih-hud-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.sih-hud-narrative {
+  font-size: 0.77rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--emerald);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.sih-hud-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.sih-hud-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+.sih-hud-btn:hover {
+  background: rgba(14, 165, 233, 0.25);
+  border-color: var(--cyan);
+}
+.sih-hud-btn.primary {
+  background: var(--cyan);
+  color: #0f172a;
+  font-weight: 700;
+}
+.sih-hud-btn.exit {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #fca5a5;
+}
+.sih-hud-btn.exit:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.sih-progress-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.sih-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--emerald));
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Provenance Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 3000;
+  display: flex; justify-content: center; align-items: center;
+  padding: 20px;
+}
+.modal-overlay.hidden { display: none; }
+.provenance-card {
+  background: var(--bg-panel);
+  border: 1.5px solid var(--border-active);
+  border-radius: var(--radius-lg);
+  width: 620px; max-width: 95vw;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.provenance-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px;
+}
+.provenance-tag.obs { background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.3); }
+.provenance-tag.pred { background: rgba(168,85,247,0.15); color: #9333ea; border: 1px solid rgba(168,85,247,0.3); }
+.provenance-tag.sim { background: rgba(14,165,233,0.15); color: #0284c7; border: 1px solid rgba(14,165,233,0.3); }
+.provenance-tag.est { background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); }
+.provenance-tag.phys { background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); }
+.provenance-tag.twin { background: rgba(99,102,241,0.15); color: #4338ca; border: 1px solid rgba(99,102,241,0.3); }
+.provenance-tag.cache { background: rgba(100,116,139,0.15); color: #475569; border: 1px solid rgba(100,116,139,0.3); }
+
+/* Vessel Digital Twin Box */
+.vessel-twin-box {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 0.74rem;
+}
+.twin-badge {
+  font-size: 0.62rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* ═══ RESPONSIVE DESIGN ═══ */
+@media (max-width: 1280px) {
+  #sidebar-controls { width: 390px; }
+  #sih-controller-hud {
+    left: calc(390px + (100vw - 390px) / 2);
+    width: 520px;
+    max-width: calc(100vw - 420px);
+  }
+  .stat-badge:nth-child(n+5) { display: none; }
+}
+
+@media (max-width: 1024px) {
+  #sidebar-controls { width: 350px; }
+  .tab-btn { font-size: 0.65rem; padding: 6px 1px; }
+  #sih-controller-hud {
+    left: calc(350px + (100vw - 350px) / 2);
+    width: 480px;
+    max-width: calc(100vw - 370px);
+    padding: 10px 14px;
+  }
+  .stats-ribbon { gap: 4px; }
+  .stat-badge { padding: 3px 8px; font-size: 0.68rem; }
+  .brand-sub { display: none; }
+}
+
+@media (max-width: 768px) {
+  #main-content {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  #sidebar-controls {
+    width: 100%;
+    min-width: 100%;
+    height: 48vh;
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+  }
+  #map-container {
+    height: 52vh;
+    width: 100%;
+  }
+  #sih-controller-hud {
+    left: 50%;
+    bottom: 12px;
+    width: 94vw;
+    max-width: 94vw;
+    padding: 10px 12px;
+  }
+  .map-legend {
+    display: none;
+  }
+  .map-quick-controls {
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPACT 3D POLAR RESEARCH VESSEL & VOYAGE PLAYBACK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Leaflet DivIcon Container */
+.compact-vessel-marker-container {
+  pointer-events: auto !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.compact-3d-vessel {
+  position: relative;
+  transition: transform 0.06s linear;
+  will-change: transform;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 6px rgba(2, 12, 27, 0.55));
+}
+
+.compact-3d-vessel:hover {
+  filter: drop-shadow(0 4px 10px rgba(14, 165, 233, 0.6)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
+}
+
+/* Voyage Playback Controller Card */
+.voyage-playback-box {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voyage-playback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voyage-playback-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.voyage-playback-title i {
+  width: 14px;
+  height: 14px;
+  color: var(--cyan);
+}
+
+.voyage-chip {
+  font-size: 0.62rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.voyage-chip.arrived {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.voyage-chip.paused {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.voyage-speed-badge {
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  font-weight: 800;
+  color: #ffffff;
+  background: #0284c7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.voyage-speed-badge:hover {
+  background: #0369a1;
+  transform: scale(1.05);
+}
+
+.voyage-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.voyage-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.voyage-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 100%);
+  border-radius: 3px;
+  transition: width 0.08s linear;
+}
+
+.voyage-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+}
+
+.voyage-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.voyage-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--blue-dark);
+  color: #ffffff;
+  border: 1px solid var(--blue-dark);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.voyage-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.voyage-btn.secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.voyage-btn.secondary:hover {
+  background: var(--bg-inset);
+}
+
+.voyage-btn i {
+  width: 13px;
+  height: 13px;
+}
+
+.voyage-disclosure-text {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* Vessel Popups */
+.vessel-telemetry-popup .leaflet-popup-content-wrapper {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 20, 40, 0.2);
+  padding: 4px;
+}
+.vessel-telemetry-popup .leaflet-popup-content {
+  margin: 10px 12px;
+  line-height: 1.4;
+}
+
+/* Safety Disclaimer Banner */
+.safety-disclaimer-bar {
+  background: #fffbeb;
+  border-bottom: 1px solid #f59e0b;
+  color: #92400e;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 6px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 950;
+}
+.safety-disclaimer-bar i {
+  width: 15px;
+  height: 15px;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.voyage-chip.halted {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.voyage-chip.screened {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+
+.primary-action {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  padding: 8px 16px !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+.primary-action:hover {
+  background: rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+}

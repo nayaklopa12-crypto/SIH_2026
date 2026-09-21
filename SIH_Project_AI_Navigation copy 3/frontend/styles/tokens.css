@@ -1,0 +1,203 @@
+/* ============================================================================
+   PART 2 — UNIFIED DESIGN SYSTEM (SIH26059)
+   ----------------------------------------------------------------------------
+   Resolved token set for the editorial-dark / Swiss-brutalist synthesis: layered
+   stroke-depth typography and tactile grain from the editorial reference, hairline
+   precision + a single functional accent + mono technical labels from the
+   brutalist one. Every Part 3 component reads from here and hardcodes nothing.
+
+   SCOPING NOTE (important): the existing dashboard at `/` runs a cyan polar-console
+   palette out of app/globals.css. These warm tokens would clash with it, so they
+   are scoped to `.editorial-root` rather than `:root` — the wrapper that
+   app/landing/layout.tsx puts around the landing route. Nothing here can leak
+   into or restyle the shipped dashboard.
+   ========================================================================== */
+
+.editorial-root {
+  /* Base */
+  --bg: #141210;           /* warm matte near-black */
+  --ink: #EDE6DA;          /* warm off-white, primary text */
+  --mono-label: #8C8175;   /* muted stone, secondary/technical labels */
+
+  /* Single functional accent — ONE primary action/highlight type only */
+  --signal: #E8944A;       /* warm signal amber */
+  --signal-dim: #C97934;   /* hover/pressed step */
+  --signal-tint: #F2B87A;  /* focus ring step */
+
+  /* Structure */
+  --hairline: rgba(237, 230, 218, 0.12);
+  --hairline-strong: rgba(237, 230, 218, 0.22);
+
+  /* Depth (stroke-offset text layering) */
+  --stroke-depth: rgba(237, 230, 218, 0.25);
+
+  /* One step lighter than --bg, for raised item surfaces (dock items etc.) */
+  --bg-step: #1D1A17;
+
+  /* Typography families — exactly two: one display, one mono. */
+  --font-display: 'Archivo', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono-tech: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Motion — ONE easing register across every component so the set reads as one
+     system. Entrances use --ease-out; scroll-scrubbed motion uses --ease-inout.
+     These mirror GSAP's power2.out / power1.inOut for the CSS-only components. */
+  --ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);      /* ≈ power2.out */
+  --ease-inout: cubic-bezier(0.45, 0.05, 0.55, 0.95); /* ≈ power1.inOut */
+  --dur-fast: 200ms;
+  --dur: 300ms;
+  --dur-slow: 600ms;
+
+  color: var(--ink);
+  background-color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The landing route sits inside the root layout, which paints a cyan `polar-bg`
+   body and a fixed Three.js ice canvas at z-index 0. An opaque, positioned
+   wrapper above that canvas is what keeps the two palettes from bleeding —
+   without editing the root layout. */
+.editorial-root {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+/* --- Texture: one global fractal-noise overlay at 3.5% ---------------------- */
+/* Applied once by the landing layout, never per component. pointer-events:none
+   so it can never intercept a click; aria-hidden on the element itself. */
+.editorial-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+}
+
+/* --- Type utilities -------------------------------------------------------- */
+
+/* Hero/section headline: display face, 900, uppercase, tight tracking + leading. */
+.ed-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+}
+
+/* Technical label / timestamp / data readout: mono, wide tracking, small. */
+.ed-mono-label {
+  font-family: var(--font-mono-tech);
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--mono-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.ed-mono-label--tight { letter-spacing: 0.2em; }
+.ed-mono-label--wide  { letter-spacing: 0.4em; }
+
+/* Body copy: same display family at regular weight — no third family. */
+.ed-body {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
+}
+
+/* --- Depth effect: stroke-offset back layer behind a solid front layer ------ */
+/* Hero-level headlines only. Markup:
+     <span class="ed-depth"><span data-depth-back aria-hidden="true">X</span>X</span>
+   The back layer is aria-hidden so a screen reader reads the headline once. */
+.ed-depth {
+  position: relative;
+  display: inline-block;
+}
+.ed-depth > [data-depth-back] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(4px, 4px);
+  color: transparent;
+  -webkit-text-stroke: 1px var(--stroke-depth);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.ed-depth > :not([data-depth-back]) { position: relative; z-index: 1; }
+
+/* --- Structure: hairlines instead of cards/shadows -------------------------- */
+.ed-hairline        { border: 1px solid var(--hairline); }
+.ed-hairline-t      { border-top: 1px solid var(--hairline); }
+.ed-hairline-b      { border-bottom: 1px solid var(--hairline); }
+.ed-hairline-l      { border-left: 1px solid var(--hairline); }
+.ed-hairline-r      { border-right: 1px solid var(--hairline); }
+.ed-hairline-strong { border-color: var(--hairline-strong); }
+
+/* Radius ceiling: 0–3px. No pill shapes — the LogoTicker mask container is the
+   single sanctioned exception and declares its own radius locally. */
+.editorial-root :where(button, input, textarea, select, [data-ed-surface]) {
+  border-radius: 2px;
+}
+
+/* --- Accent rule ----------------------------------------------------------- */
+.ed-signal { color: var(--signal); }
+.ed-signal-bg { background-color: var(--signal); color: var(--bg); }
+
+.editorial-root :where(a, button):focus-visible {
+  outline: 2px solid var(--signal-tint);
+  outline-offset: 2px;
+}
+
+/* --- Reduced motion -------------------------------------------------------- */
+/* Global backstop. Each Part 3 component ALSO checks the query in JS so it can
+   render its true end-state rather than a frozen frame-0. */
+@media (prefers-reduced-motion: reduce) {
+  .editorial-root *,
+  .editorial-root *::before,
+  .editorial-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- 3.6 LogoTicker: seamless marquee ---------------------------------------
+   The row's content is duplicated exactly once, so translating the track by -50%
+   lands the copy precisely where the original started — the loop has no seam and
+   no snap. `linear` (not the eased register) because a marquee that accelerates
+   reads as broken; this is the one deliberate exception to the easing rule and it
+   is confined to continuous ambient motion. */
+@keyframes ed-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ed-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ed-marquee var(--ed-marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+.ed-marquee-viewport:hover .ed-marquee-track,
+.ed-marquee-viewport:focus-within .ed-marquee-track {
+  animation-play-state: paused;
+}
+/* Edge fade so items dissolve at the container edges instead of clipping. */
+.ed-marquee-viewport {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* A continuous marquee has no meaningful end-state, so it simply stops. The
+     `!important` in the global backstop would otherwise leave it running at a
+     1ms duration, which is far worse than static. */
+  .ed-marquee-track { animation: none !important; transform: none !important; }
+  .ed-marquee-viewport { overflow-x: auto; }
+}

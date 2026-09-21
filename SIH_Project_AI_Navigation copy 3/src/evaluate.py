@@ -197,7 +197,7 @@ def plot_trajectory_evaluations(
 
     plt.suptitle("Antarctic AI Navigation - Trajectory Benchmarking (Actual vs Baseline vs GRU)", color="#FFFFFF", fontsize=14, fontweight="bold", y=0.98)
     plt.tight_layout()
-    plt.savefig(save_path, dpi=200, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(save_path, dpi=100, bbox_inches="tight", facecolor=fig.get_facecolor())
     plt.close()
     print(f"[PLOT] Trajectory evaluation visualization saved to: {save_path}")
 
@@ -258,10 +258,15 @@ def run_evaluation(
     baseline_preds = baseline.predict_from_sequences(X_test_raw, base_test, horizons=horizons)
     baseline_metrics = compute_haversine_errors(baseline_preds, y_test_coords, horizons=horizons)
 
-    # 2. PyTorch GRU Model Inference
-    X_test_t = torch.tensor(X_test_scaled, dtype=torch.float32).to(device)
+    # 2. PyTorch GRU Model Inference (batched to prevent CPU memory spikes)
+    eval_batch_size = 256
+    gru_deltas_list = []
     with torch.no_grad():
-        gru_deltas = model(X_test_t).cpu().numpy()
+        for b_start in range(0, len(X_test_scaled), eval_batch_size):
+            b_chunk = torch.tensor(X_test_scaled[b_start : b_start + eval_batch_size], dtype=torch.float32).to(device)
+            d_out = model(b_chunk).cpu().numpy()
+            gru_deltas_list.append(d_out)
+    gru_deltas = np.vstack(gru_deltas_list)
 
     # Convert predicted deltas back to absolute lat/lon
     gru_preds = np.zeros_like(y_test_coords)
@@ -319,6 +324,11 @@ def run_evaluation(
     with open(metrics_save_path, "w") as f:
         json.dump(summary, f, indent=2)
     print(f"\n[SAVED] Benchmark metrics exported to {metrics_save_path}")
+
+    # Clean up large memory buffers before plotting
+    import gc
+    del X_test_raw, X_test_scaled, baseline_preds, gru_preds, gru_deltas
+    gc.collect()
 
     # Generate visual evaluation plots
     plot_trajectory_evaluations(

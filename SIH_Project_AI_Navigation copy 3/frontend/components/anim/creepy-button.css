@@ -1,0 +1,110 @@
+/* ============================================================================
+   CreepyButton — static styles, imported EXACTLY ONCE.
+   ----------------------------------------------------------------------------
+   Spec 3.9.3 (a correctness note, not a style preference): the stock component
+   injects a <style> block containing a `:root { … }` selector on every mount, so
+   rendering it twice on a page duplicates a global-scope injection and each copy
+   fights the other for the same variables. Everything static — keyframes and all
+   `.creepy-btn*` rules — therefore lives in this file, imported once by the
+   component module. Only the per-instance `--cb-*` overrides remain inline on the
+   wrapper, which is what the component's own theming API is designed for.
+
+   Defaults below are the Part 2 mapping the spec prescribes:
+     --cb-black    -> --bg      #141210
+     --cb-gray1    -> --ink     #EDE6DA
+     --cb-primary5 -> --signal  #E8944A
+     --cb-primary6 -> hover     #C97934
+     --cb-primary3 -> focus     #F2B87A
+   Scoped to .creepy-btn-root rather than :root, so no global leakage.
+   ========================================================================== */
+
+.creepy-btn-root {
+  --cb-black: #141210;
+  --cb-gray1: #EDE6DA;
+  --cb-primary5: #E8944A;
+  --cb-primary6: #C97934;
+  --cb-primary3: #F2B87A;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The eyes. Kept above the button so the pupils read as watching the cursor. */
+.creepy-btn-eyes {
+  display: flex;
+  gap: 14px;
+}
+
+.creepy-btn-eye {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--cb-gray1);
+  border: 1.5px solid var(--cb-black);
+  overflow: hidden;
+}
+
+.creepy-btn-pupil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 50%;
+  background: var(--cb-black);
+  /* transform is set inline per-frame from the cursor position; the transition
+     smooths the gaps between pointer events without a JS animation loop. */
+  transition: transform 90ms linear;
+}
+
+/* Eyelid: a full-cover shutter that drops on the blink keyframe. */
+.creepy-btn-lid {
+  position: absolute;
+  inset: 0;
+  background: var(--cb-black);
+  transform: scaleY(0);
+  transform-origin: top center;
+  animation: creepy-btn-blink 5.4s ease-in-out infinite;
+}
+.creepy-btn-eye:nth-child(2) .creepy-btn-lid {
+  /* Offset so the two eyes don't blink in mechanical lockstep. */
+  animation-delay: 0.12s;
+}
+
+@keyframes creepy-btn-blink {
+  0%, 92%, 100% { transform: scaleY(0); }
+  95%           { transform: scaleY(1); }
+}
+
+/* "Londrina Solid" is deliberately kept (spec 3.9.2): it is the character of this
+   one contained component and appears nowhere else, so it cannot fragment the
+   design system. If the webfont is unavailable offline the stack falls through to
+   a heavy system face — degraded, never broken. */
+.creepy-btn {
+  font-family: "Londrina Solid", "Archivo", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  padding: 10px 22px;
+  border-radius: 2px;
+  color: var(--cb-black);
+  background: var(--cb-primary5);
+  border: 1.5px solid var(--cb-black);
+  cursor: pointer;
+  transition: background-color 200ms ease-out, transform 200ms ease-out;
+}
+.creepy-btn:hover { background: var(--cb-primary6); }
+.creepy-btn:active { transform: translateY(1px); }
+.creepy-btn:focus-visible {
+  outline: 3px solid var(--cb-primary3);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* End-state for a blink is "open", so the lid simply stays up. */
+  .creepy-btn-lid { animation: none; transform: scaleY(0); }
+  .creepy-btn-pupil { transition: none; }
+}

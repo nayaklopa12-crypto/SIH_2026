@@ -1,0 +1,27 @@
+# Approved Task List: Closing Identified Gaps
+
+- [x] **Gap C: Authoritative Maitri and Bharati Station Coordinates** <!-- id: 0 -->
+  - [x] Add exact NCPOR/COMNAP coordinates for Maitri & Bharati station sites and marine landing sites <!-- id: 1 -->
+  - [x] Update station definitions in `src/route_optimizer.py` and `app/frontend/app.js` <!-- id: 2 -->
+- [x] **Gap B: Physics + ML Hybrid Iceberg Model** <!-- id: 3 -->
+  - [x] Build `src/physics_iceberg.py` with Coriolis acceleration, ocean current advection, and aerodynamic/hydrodynamic drag forces <!-- id: 4 -->
+  - [x] Implement `HybridIcebergPredictor` combining physical prior with neural network residual correction <!-- id: 5 -->
+  - [x] Add `/api/predict/hybrid` endpoint in `app/backend/main.py` <!-- id: 6 -->
+- [x] **Gap E: Weather / Ocean Environmental Data Service** <!-- id: 7 -->
+  - [x] Build `src/environmental_service.py` with live Open-Meteo polar weather/marine API querying and timeout protection <!-- id: 8 -->
+  - [x] Create `data/environmental_cache.json` with verified historical reanalysis data for Drake Passage, Weddell Sea, Queen Maud Land, and Prydz Bay <!-- id: 9 -->
+  - [x] Add `/api/environmental/current` and `/api/environmental/corridors` endpoints <!-- id: 10 -->
+  - [x] Connect `radar_simulation.html` and `index.html` to real environmental data instead of Math.random() <!-- id: 11 -->
+- [x] **Gap D: Vessel Digital Twin** <!-- id: 12 -->
+  - [x] Build `src/vessel_twin.py` implementing IMO Polar Code specifications (Polar Class, Holtrop open-water resistance, Lindqvist ice resistance, power and fuel burn, POLARIS risk index) <!-- id: 13 -->
+  - [x] Add `/api/vessel/twin` and `/api/vessel/twin/simulate` endpoints with clear `CONFIGURABLE_DEMONSTRATION_TWIN` labeling <!-- id: 14 -->
+  - [x] Update route optimizer fuel profiling to interface with vessel digital twin <!-- id: 15 -->
+- [x] **Gap A: Sea-Ice Forecasting & Concentration Service** <!-- id: 16 -->
+  - [x] Audit and document local data availability honestly in code docstrings and API metadata <!-- id: 17 -->
+  - [x] Build `src/sea_ice_service.py` implementing NSIDC monthly sea-ice extent climatology and dynamic edge advection forecast <!-- id: 18 -->
+  - [x] Add `/api/sea-ice/forecast` endpoint with explicit provenance disclosure <!-- id: 19 -->
+- [x] **Verification & Validation** <!-- id: 20 -->
+  - [x] Run baseline `test_api.py` (verify 19/19 passing) <!-- id: 21 -->
+  - [x] Build and execute `test_new_capabilities.py` for all 4 gap implementations <!-- id: 22 -->
+  - [x] Verify live Uvicorn server serving updated endpoints <!-- id: 23 -->
+  - [x] Update `implementation_plan.md` and report honest results <!-- id: 24 -->

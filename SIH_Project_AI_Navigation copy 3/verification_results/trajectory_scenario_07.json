@@ -1,0 +1,1520 @@
+[
+  {
+    "time": 0.10671830177307129,
+    "ship": {
+      "lat": -33.89716672347663,
+      "lon": 18.377055347252362,
+      "heading": 251.81275916394588,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.22818875312805176,
+    "ship": {
+      "lat": -33.89872748934635,
+      "lon": 18.3713325390634,
+      "heading": 251.81250745424734,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.3343377113342285,
+    "ship": {
+      "lat": -33.90184909843994,
+      "lon": 18.359886639053567,
+      "heading": 251.81198028992094,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.4421660900115967,
+    "ship": {
+      "lat": -33.90497081068759,
+      "lon": 18.348440360812194,
+      "heading": 251.81142839911467,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.5479304790496826,
+    "ship": {
+      "lat": -33.90653170549987,
+      "lon": 18.3427170798338,
+      "heading": 251.81114525520923,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.6548280715942383,
+    "ship": {
+      "lat": -33.909653572512774,
+      "lon": 18.331270234119824,
+      "heading": 251.81056775259674,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.7641456127166748,
+    "ship": {
+      "lat": -33.91121454471794,
+      "lon": 18.325546669367533,
+      "heading": 251.81027440732953,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.8694469928741455,
+    "ship": {
+      "lat": -33.914336566537116,
+      "lon": 18.314099256030566,
+      "heading": 251.8096805529367,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 0.9812178611755371,
+    "ship": {
+      "lat": -33.915897616155675,
+      "lon": 18.308375407429175,
+      "heading": 251.80938068841715,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.0864872932434082,
+    "ship": {
+      "lat": -33.917458691583256,
+      "lon": 18.3026514641947,
+      "heading": 251.80907922134054,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.1924006938934326,
+    "ship": {
+      "lat": -33.92058091987461,
+      "lon": 18.291203293793053,
+      "heading": 251.80847233037252,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.2971012592315674,
+    "ship": {
+      "lat": -33.92214207274294,
+      "lon": 18.285479066609163,
+      "heading": 251.8081672590771,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.4120004177093506,
+    "ship": {
+      "lat": -33.92526445593633,
+      "lon": 18.27403032823343,
+      "heading": 251.8075545690856,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.52296781539917,
+    "ship": {
+      "lat": -33.92838694242053,
+      "lon": 18.26258121112467,
+      "heading": 251.80693920437773,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.648123025894165,
+    "ship": {
+      "lat": -33.929948224402395,
+      "lon": 18.25685651052449,
+      "heading": 251.8066307348996,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.7544543743133545,
+    "ship": {
+      "lat": -33.93463222533444,
+      "lon": 18.239681840440344,
+      "heading": 251.80570294600113,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.8645260334014893,
+    "ship": {
+      "lat": -33.9361936106482,
+      "lon": 18.23395676095653,
+      "heading": 251.8053930532716,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 1.9713048934936523,
+    "ship": {
+      "lat": -33.937755021800655,
+      "lon": 18.228231586730885,
+      "heading": 251.8050829108265,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.1257872581481934,
+    "ship": {
+      "lat": -33.94087792163073,
+      "lon": 18.216780954020614,
+      "heading": 251.8044619965849,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.2318241596221924,
+    "ship": {
+      "lat": -33.94400092484293,
+      "lon": 18.205329942242543,
+      "heading": 251.8038404029146,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.338038444519043,
+    "ship": {
+      "lat": -33.94556246522304,
+      "lon": 18.199604294182148,
+      "heading": 251.80352939906606,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.4505069255828857,
+    "ship": {
+      "lat": -33.948685623542694,
+      "lon": 18.188152713676757,
+      "heading": 251.8029070506475,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.556081533432007,
+    "ship": {
+      "lat": -33.95024724148681,
+      "lon": 18.182426781215003,
+      "heading": 251.8025957294227,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.6629574298858643,
+    "ship": {
+      "lat": -33.95337055495504,
+      "lon": 18.170974631831495,
+      "heading": 251.8019728395318,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.7709810733795166,
+    "ship": {
+      "lat": -33.95493225048373,
+      "lon": 18.16524841489298,
+      "heading": 251.80166128572648,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.878798246383667,
+    "ship": {
+      "lat": -33.95805571914167,
+      "lon": 18.153795696480515,
+      "heading": 251.80103799003325,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 2.9888405799865723,
+    "ship": {
+      "lat": -33.961179291282285,
+      "lon": 18.14234259863159,
+      "heading": 251.80041447392557,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.094733715057373,
+    "ship": {
+      "lat": -33.96274111616431,
+      "lon": 18.13661590739749,
+      "heading": 251.8001026423102,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.2044975757598877,
+    "ship": {
+      "lat": -33.96742674608471,
+      "lon": 18.11943526435603,
+      "heading": 251.79916688549827,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.3104965686798096,
+    "ship": {
+      "lat": -33.968988674490575,
+      "lon": 18.113708193534528,
+      "heading": 251.79885488613456,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.420226812362671,
+    "ship": {
+      "lat": -33.970550628783116,
+      "lon": 18.1079810277952,
+      "heading": 251.79854284929706,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.528609275817871,
+    "ship": {
+      "lat": -33.97211260896463,
+      "lon": 18.102253767129664,
+      "heading": 251.79823077627805,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.6370391845703125,
+    "ship": {
+      "lat": -33.975236647003705,
+      "lon": 18.09079896098638,
+      "heading": 251.79760652606535,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.7913200855255127,
+    "ship": {
+      "lat": -33.97679870486585,
+      "lon": 18.08507141549185,
+      "heading": 251.79729435065303,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 3.896732807159424,
+    "ship": {
+      "lat": -33.98332148340475,
+      "lon": 18.078589230053257,
+      "heading": 242.75185115369004,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.006414413452148,
+    "ship": {
+      "lat": -33.99324288656216,
+      "lon": 18.077080138016054,
+      "heading": 228.28309340080477,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.112215280532837,
+    "ship": {
+      "lat": -33.9982035949416,
+      "lon": 18.076325590963027,
+      "heading": 222.52973246113072,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.217403888702393,
+    "ship": {
+      "lat": -34.00812502530364,
+      "lon": 18.074816494787868,
+      "heading": 213.32649001373466,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.327056646347046,
+    "ship": {
+      "lat": -34.01308574728691,
+      "lon": 18.074061945665637,
+      "heading": 209.66687910509472,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.433868169784546,
+    "ship": {
+      "lat": -34.023007204859596,
+      "lon": 18.072552845351613,
+      "heading": 203.81279914193965,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.545911073684692,
+    "ship": {
+      "lat": -34.027967940449685,
+      "lon": 18.07179829415972,
+      "heading": 201.48493044359475,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.652345657348633,
+    "ship": {
+      "lat": -34.03292868057605,
+      "lon": 18.071043742277837,
+      "heading": 199.48290517719124,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.758194923400879,
+    "ship": {
+      "lat": -34.042850174438925,
+      "lon": 18.0695346364439,
+      "heading": 196.280299120167,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.865180015563965,
+    "ship": {
+      "lat": -34.047810928176105,
+      "lon": 18.06878008249175,
+      "heading": 195.00674763583163,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 4.970191478729248,
+    "ship": {
+      "lat": -34.057732449263625,
+      "lon": 18.067270972516823,
+      "heading": 192.96940817521374,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.079233169555664,
+    "ship": {
+      "lat": -34.062693216614626,
+      "lon": 18.066516416493947,
+      "heading": 192.15920675137716,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.18727970123291,
+    "ship": {
+      "lat": -34.067653988504226,
+      "lon": 18.065761859780725,
+      "heading": 191.46237528771326,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.296753168106079,
+    "ship": {
+      "lat": -34.077575545900565,
+      "lon": 18.064252744283053,
+      "heading": 190.34755708500393,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.407059907913208,
+    "ship": {
+      "lat": -34.082536331407965,
+      "lon": 18.0634981854985,
+      "heading": 189.90418181141672,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.515506029129028,
+    "ship": {
+      "lat": -34.0874971214553,
+      "lon": 18.0627436260234,
+      "heading": 189.52282080649002,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.624312162399292,
+    "ship": {
+      "lat": -34.09741871517109,
+      "lon": 18.061234505001373,
+      "heading": 188.91262906243185,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.731372356414795,
+    "ship": {
+      "lat": -34.1023795188402,
+      "lon": 18.06047994345434,
+      "heading": 188.66991058773988,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.839427947998047,
+    "ship": {
+      "lat": -34.10734032705057,
+      "lon": 18.05972538121656,
+      "heading": 188.46111439939955,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 5.947110176086426,
+    "ship": {
+      "lat": -34.11230113980253,
+      "lon": 18.058970818287982,
+      "heading": 188.28149136970478,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.05431866645813,
+    "ship": {
+      "lat": -34.11726195709641,
+      "lon": 18.058216254668558,
+      "heading": 188.12695724882997,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.164104700088501,
+    "ship": {
+      "lat": -34.12222277893254,
+      "lon": 18.057461690358238,
+      "heading": 187.9939995819244,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.272733449935913,
+    "ship": {
+      "lat": -34.127183605311245,
+      "lon": 18.05670712535697,
+      "heading": 187.87959765782273,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.381488800048828,
+    "ship": {
+      "lat": -34.13710527169772,
+      "lon": 18.055197993281386,
+      "heading": 187.69643348522175,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.490689516067505,
+    "ship": {
+      "lat": -34.14206611170615,
+      "lon": 18.054443426206973,
+      "heading": 187.62351577727736,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.598886966705322,
+    "ship": {
+      "lat": -34.14206611170615,
+      "lon": 18.054443426206973,
+      "heading": 187.62351577727736,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.709851026535034,
+    "ship": {
+      "lat": -34.15198780535505,
+      "lon": 18.05293428998465,
+      "heading": 187.50670969152452,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.817613363265991,
+    "ship": {
+      "lat": -34.15694865899618,
+      "lon": 18.052179720836637,
+      "heading": 187.46017820880388,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 6.925013542175293,
+    "ship": {
+      "lat": -34.161909517182195,
+      "lon": 18.051425150997325,
+      "heading": 187.42010274981226,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 7.0339555740356445,
+    "ship": {
+      "lat": -34.16687037991343,
+      "lon": 18.050670580466665,
+      "heading": 187.38557946361004,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 7.142347574234009,
+    "ship": {
+      "lat": -34.17183124719023,
+      "lon": 18.049916009244605,
+      "heading": 187.35583103839917,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 7.2529237270355225,
+    "ship": {
+      "lat": -34.18175299538177,
+      "lon": 18.048406864726086,
+      "heading": 187.30807840669343,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.360454082489014,
+    "ship": {
+      "lat": -34.18175299538177,
+      "lon": 18.048406864726086,
+      "heading": 187.30807840669343,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.46828293800354,
+    "ship": {
+      "lat": -34.18671387629719,
+      "lon": 18.04765229142953,
+      "heading": 187.28900488655358,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.578977346420288,
+    "ship": {
+      "lat": -34.19663565176895,
+      "lon": 18.046143142761558,
+      "heading": 187.25832776771813,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.6859824657440186,
+    "ship": {
+      "lat": -34.20159654632596,
+      "lon": 18.04538856739005,
+      "heading": 187.2460440256582,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.794739007949829,
+    "ship": {
+      "lat": -34.20655744543082,
+      "lon": 18.04463399132679,
+      "heading": 187.23542155514258,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 7.902038097381592,
+    "ship": {
+      "lat": -34.21151834908386,
+      "lon": 18.043879414571734,
+      "heading": 187.22622777054585,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.01168417930603,
+    "ship": {
+      "lat": -34.221440170035805,
+      "lon": 18.04237025898602,
+      "heading": 187.2113541678823,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.118999481201172,
+    "ship": {
+      "lat": -34.23136200918441,
+      "lon": 18.040861100632505,
+      "heading": 187.20013609437456,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.231284618377686,
+    "ship": {
+      "lat": -34.24128386653231,
+      "lon": 18.03935193951079,
+      "heading": 187.19162159364123,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.338935613632202,
+    "ship": {
+      "lat": -34.2462448020318,
+      "lon": 18.038597357911737,
+      "heading": 187.1881503710083,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.447046279907227,
+    "ship": {
+      "lat": -34.25120574208211,
+      "lon": 18.037842775620483,
+      "heading": 187.18510659874448,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.554709672927856,
+    "ship": {
+      "lat": -34.25616668668354,
+      "lon": 18.037088192636983,
+      "heading": 187.18243042618906,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 8.660904884338379,
+    "ship": {
+      "lat": -34.26112763583644,
+      "lon": 18.036333608961183,
+      "heading": 187.18007038178337,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 8.767444372177124,
+    "ship": {
+      "lat": -34.271049547797915,
+      "lon": 18.03482443953249,
+      "heading": 187.17612781241462,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 8.87427306175232,
+    "ship": {
+      "lat": -34.27601051060715,
+      "lon": 18.034069853779496,
+      "heading": 187.17447448028804,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 8.979719877243042,
+    "ship": {
+      "lat": -34.28097147796915,
+      "lon": 18.033315267334004,
+      "heading": 187.1729940482386,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.086833238601685,
+    "ship": {
+      "lat": -34.29089342635275,
+      "lon": 18.031806092365333,
+      "heading": 187.17045841981962,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.19724702835083,
+    "ship": {
+      "lat": -34.29089342635275,
+      "lon": 18.031806092365333,
+      "heading": 187.17045841981962,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.30299186706543,
+    "ship": {
+      "lat": -34.300815392951336,
+      "lon": 18.030296914626078,
+      "heading": 187.16836511604936,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.410978317260742,
+    "ship": {
+      "lat": -34.30577638308206,
+      "lon": 18.029542324717358,
+      "heading": 187.16744704885446,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.526562929153442,
+    "ship": {
+      "lat": -34.31073737776751,
+      "lon": 18.02878773411584,
+      "heading": 187.1665988990403,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.635382890701294,
+    "ship": {
+      "lat": -34.320659380803875,
+      "lon": 18.02727855083423,
+      "heading": 187.1650745388531,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.744016170501709,
+    "ship": {
+      "lat": -34.325620389155446,
+      "lon": 18.026523958154034,
+      "heading": 187.16438265874763,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.850787162780762,
+    "ship": {
+      "lat": -34.33554241952699,
+      "lon": 18.02501477071461,
+      "heading": 187.16310820239823,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 9.95829701423645,
+    "ship": {
+      "lat": -34.34050344154761,
+      "lon": 18.024260175955284,
+      "heading": 187.16251565932362,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.064480781555176,
+    "ship": {
+      "lat": -34.350425499260176,
+      "lon": 18.022750984357167,
+      "heading": 187.16140003728572,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.172217845916748,
+    "ship": {
+      "lat": -34.35538653495277,
+      "lon": 18.02199638751827,
+      "heading": 187.16087061887026,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.28126311302185,
+    "ship": {
+      "lat": -34.3653086200122,
+      "lon": 18.020487191760566,
+      "heading": 187.15985590586115,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 10.391818284988403,
+    "ship": {
+      "lat": -34.37026966937969,
+      "lon": 18.019732592841656,
+      "heading": 187.15936657901977,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 10.499077320098877,
+    "ship": {
+      "lat": -34.38019178179183,
+      "lon": 18.018223392923478,
+      "heading": 187.15841593132063,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.604925394058228,
+    "ship": {
+      "lat": -34.38515284483713,
+      "lon": 18.01746879192411,
+      "heading": 187.157952045731,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.712323665618896,
+    "ship": {
+      "lat": -34.3950749846078,
+      "lon": 18.015959587844566,
+      "heading": 187.1570420287045,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.817698955535889,
+    "ship": {
+      "lat": -34.40003606133382,
+      "lon": 18.015204984764296,
+      "heading": 187.15659426595187,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 10.92875075340271,
+    "ship": {
+      "lat": -34.40995822846885,
+      "lon": 18.013695776522503,
+      "heading": 187.1557099738643,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.03459906578064,
+    "ship": {
+      "lat": -34.4149193188785,
+      "lon": 18.012941171360886,
+      "heading": 187.1552724069236,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.147666215896606,
+    "ship": {
+      "lat": -34.424841513383704,
+      "lon": 18.011431958955963,
+      "heading": 187.15440435890935,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.253267288208008,
+    "ship": {
+      "lat": -34.42980261747989,
+      "lon": 18.01067735171256,
+      "heading": 187.1539732178669,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.363799333572388,
+    "ship": {
+      "lat": -34.43480202119085,
+      "lon": 18.010583734320736,
+      "heading": 186.27630044685702,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.469062805175781,
+    "ship": {
+      "lat": -34.44480082882673,
+      "lon": 18.010396499533083,
+      "heading": 184.87235389157672,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.576671600341797,
+    "ship": {
+      "lat": -34.44980023275166,
+      "lon": 18.010302882137257,
+      "heading": 184.31408559631882,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 11.683075189590454,
+    "ship": {
+      "lat": -34.45979904081553,
+      "lon": 18.010115647341596,
+      "heading": 183.421058432358,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 11.789877891540527,
+    "ship": {
+      "lat": -34.46479844495448,
+      "lon": 18.01002202994176,
+      "heading": 183.06594926298192,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 11.894919872283936,
+    "ship": {
+      "lat": -34.47479725344644,
+      "lon": 18.009834795138076,
+      "heading": 182.4978954286886,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 12.005197525024414,
+    "ship": {
+      "lat": -34.479796657799454,
+      "lon": 18.00974117773423,
+      "heading": 182.27200683292415,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.11282730102539,
+    "ship": {
+      "lat": -34.48979546671957,
+      "lon": 18.009553942922533,
+      "heading": 181.91065422008933,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.218933343887329,
+    "ship": {
+      "lat": -34.494794871286686,
+      "lon": 18.00946032551468,
+      "heading": 181.76695713814001,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.325352907180786,
+    "ship": {
+      "lat": -34.50479368063506,
+      "lon": 18.00927309069496,
+      "heading": 181.53707806272268,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.433785200119019,
+    "ship": {
+      "lat": -34.50979308541633,
+      "lon": 18.009179473283098,
+      "heading": 181.44565937893526,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.54245400428772,
+    "ship": {
+      "lat": -34.51979189519304,
+      "lon": 18.00899223845536,
+      "heading": 181.29940482112556,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.648451089859009,
+    "ship": {
+      "lat": -34.5247913001885,
+      "lon": 18.008898621039485,
+      "heading": 181.2412381188085,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.762475728988647,
+    "ship": {
+      "lat": -34.53479011039364,
+      "lon": 18.008711386203725,
+      "heading": 181.14817342247215,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.86876130104065,
+    "ship": {
+      "lat": -34.539789515603324,
+      "lon": 18.00861776878384,
+      "heading": 181.11115683513128,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 12.976088523864746,
+    "ship": {
+      "lat": -34.54978832623697,
+      "lon": 18.008430533940054,
+      "heading": 181.0519238546293,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.084292888641357,
+    "ship": {
+      "lat": -34.55478773166094,
+      "lon": 18.008336916516154,
+      "heading": 181.02835991747486,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.19166350364685,
+    "ship": {
+      "lat": -34.56478654272318,
+      "lon": 18.008149681664342,
+      "heading": 180.9906457881234,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 13.298235893249512,
+    "ship": {
+      "lat": -34.56978594836147,
+      "lon": 18.00805606423643,
+      "heading": 180.97563848248444,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 13.40585732460022,
+    "ship": {
+      "lat": -34.57478535407121,
+      "lon": 18.00796244680718,
+      "heading": 180.96272476515549,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 13.51249384880066,
+    "ship": {
+      "lat": -34.58478416570505,
+      "lon": 18.00777521194467,
+      "heading": 180.9420467166609,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.619437456130981,
+    "ship": {
+      "lat": -34.58978357162917,
+      "lon": 18.007681594511403,
+      "heading": 180.93381353745337,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.72631287574768,
+    "ship": {
+      "lat": -34.59978238369181,
+      "lon": 18.00749435964086,
+      "heading": 180.92062246966134,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.833932399749756,
+    "ship": {
+      "lat": -34.60478178983035,
+      "lon": 18.00740074220358,
+      "heading": 180.91536636746412,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 13.941190481185913,
+    "ship": {
+      "lat": -34.61478060232187,
+      "lon": 18.007213507325,
+      "heading": 180.90693742398355,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.053849220275879,
+    "ship": {
+      "lat": -34.61978000867487,
+      "lon": 18.007119889883707,
+      "heading": 180.9035749021375,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.160829544067383,
+    "ship": {
+      "lat": -34.629778821595366,
+      "lon": 18.0069326549971,
+      "heading": 180.89817492170926,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.265866041183472,
+    "ship": {
+      "lat": -34.634778228162865,
+      "lon": 18.00683903755179,
+      "heading": 180.89601681567024,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.373610258102417,
+    "ship": {
+      "lat": -34.64477704151241,
+      "lon": 18.006651802657146,
+      "heading": 180.89254341069045,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.486050844192505,
+    "ship": {
+      "lat": -34.65477585514804,
+      "lon": 18.006464567757146,
+      "heading": 180.88994677143637,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 14.597294092178345,
+    "ship": {
+      "lat": -34.65977526207315,
+      "lon": 18.006370950305136,
+      "heading": 180.8889033634257,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 14.702752113342285,
+    "ship": {
+      "lat": -34.66977407613797,
+      "lon": 18.0061837153971,
+      "heading": 180.88721301595558,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 14.820104837417603,
+    "ship": {
+      "lat": -34.67977289048897,
+      "lon": 18.005996480483706,
+      "heading": 180.885935108534,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": true
+  },
+  {
+    "time": 14.926397562026978,
+    "ship": {
+      "lat": -34.684772297771794,
+      "lon": 18.005902863025,
+      "heading": 180.88541606679644,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  },
+  {
+    "time": 15.044612884521484,
+    "ship": {
+      "lat": -34.694771112552125,
+      "lon": 18.005715628103566,
+      "heading": 180.88456448216846,
+      "speed": 1
+    },
+    "nav_state": "TACTICAL WATERWAY ACTIVE",
+    "avoiding": false
+  }
+]

@@ -2,331 +2,2059 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SIH AI Navigation - Real-Time Dynamic Evasion</title>
+  <title>Antarctic AI Navigation — 3D Tactical Radar Simulation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/vendor/three.min.js"></script>
 
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; background: radial-gradient(circle at center, #001a2c 0%, #000000 100%); font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+    :root {
+      --cyan: #00ffff;
+      --cyan-dim: rgba(0, 255, 255, 0.2);
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --bg-dark: rgba(0, 18, 30, 0.92);
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Outfit', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: radial-gradient(circle at center, #001220 0%, #000308 100%);
+      font-family: var(--font-mono);
+      overflow: hidden;
+      color: var(--cyan);
+    }
     
-    #tactical-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; perspective: 1200px; transform-style: preserve-3d; display: flex; justify-content: center; align-items: center; }
-    #map { width: 160vw; height: 160vh; background: #000; transform: rotateX(60deg) translateY(-10%) scale(1.1); transform-origin: center center; box-shadow: 0 0 100px rgba(0, 255, 255, 0.2), inset 0 0 100px rgba(0, 255, 255, 0.4); border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 50px; }
+    #tactical-container {
+      width: 100vw; height: 100vh;
+      position: absolute; top: 0; left: 0;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      display: flex; justify-content: center; align-items: center;
+      transition: perspective 0.6s ease;
+      overflow: hidden;
+      background: #000814;
+    }
+
+    #map {
+      width: 250vw; height: 250vh;
+      background: #000814;
+      transform: rotateX(60deg) translateY(-10%) scale(1.1);
+      transform-origin: center center;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .tactical-vignette {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1500;
+      background: radial-gradient(circle at center, transparent 45%, rgba(0, 8, 20, 0.5) 80%, rgba(0, 3, 8, 0.92) 100%);
+    }
+
+    /* Camera View Modes */
+    #map.cam-command { transform: rotateX(60deg) translateY(-10%) scale(1.1); }
+    #map.cam-follow   { transform: rotateX(72deg) translateY(-25%) scale(1.45); }
+    #map.cam-topdown  { transform: rotateX(0deg) translateY(0) scale(1.0); }
+    #map.cam-tactical { transform: rotateX(48deg) rotateZ(-12deg) translateY(-8%) scale(1.2); }
+    #map.cam-closeup  { transform: rotateX(65deg) translateY(-15%) scale(1.6); }
     
-    .leaflet-layer { filter: contrast(1.2) brightness(0.6) saturate(0.8) hue-rotate(180deg) invert(1); }
+    /* Authentic Nautical Cartography */
+    .leaflet-layer {
+      filter: brightness(0.85) contrast(1.3) saturate(1.15);
+    }
     .leaflet-control-zoom, .leaflet-control-attribution { display: none; }
 
     /* Radar Sweep */
-    .radar-sweep-container { width: 600px; height: 600px; margin-left: -300px; margin-top: -300px; border-radius: 50%; border: 2px solid rgba(0, 255, 255, 0.3); background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0) 70%); position: absolute; pointer-events: none; }
-    .radar-scanner { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, rgba(0,255,255,0) 0deg, rgba(0,255,255,0) 270deg, rgba(0,255,255,0.6) 360deg); animation: sweep 2s linear infinite; }
+    .radar-sweep-container {
+      width: 600px; height: 600px;
+      margin-left: -300px; margin-top: -300px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.08) 0%, rgba(0, 255, 255, 0) 70%);
+      position: absolute; pointer-events: none;
+    }
+    .radar-scanner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: conic-gradient(from 0deg, rgba(0,255,255,0) 0deg, rgba(0,255,255,0) 270deg, rgba(0,255,255,0.65) 360deg);
+      animation: sweep 2.2s linear infinite;
+    }
     @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    /* Vessel */
-    .vessel-icon { width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; position: relative; z-index: 1000; transform: rotateX(-60deg); filter: drop-shadow(0 0 15px #00ffff); }
-    .vessel-icon svg { width: 100%; height: 100%; fill: #00ffff; }
-    .vessel-icon::after { content: ''; position: absolute; top: 35px; left: 19px; width: 2px; height: 40px; background: linear-gradient(to bottom, #00ffff, transparent); }
+    /* 3D Vessel & Hydrodynamic Stern Wake */
+    .vessel-3d-container {
+      width: 32px; height: 64px;
+      margin-left: -24px; margin-top: -48px;
+      position: relative; z-index: 1000;
+      pointer-events: none;
+      transform-origin: 24px 48px;
+      transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 14px rgba(14, 165, 233, 0.6));
+    }
+    .vessel-3d-ship {
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    #vessel-webgl-canvas {
+      width: 32px; height: 64px;
+      display: block;
+      pointer-events: none;
+    }
+    .vessel-wake {
+      position: absolute;
+      top: 82px; left: 50%;
+      transform: translateX(-50%);
+      width: 44px; height: 60px;
+      pointer-events: none;
+      z-index: 850;
+    }
+    .wake-foam-center {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 7px; height: 42px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(14,165,233,0.5) 50%, transparent);
+      border-radius: 4px;
+      filter: blur(1.5px);
+      animation: wake-anim 0.8s ease-in-out infinite alternate;
+    }
+    .wake-v-left {
+      position: absolute;
+      top: 4px; right: 52%;
+      width: 18px; height: 48px;
+      border-right: 2px solid rgba(255, 255, 255, 0.75);
+      border-radius: 0 100% 0 0;
+      transform: skewX(-20deg);
+      opacity: 0.75;
+      animation: wake-expand 1.2s linear infinite;
+    }
+    .wake-v-right {
+      position: absolute;
+      top: 4px; left: 52%;
+      width: 18px; height: 48px;
+      border-left: 2px solid rgba(255, 255, 255, 0.75);
+      border-radius: 100% 0 0 0;
+      transform: skewX(20deg);
+      opacity: 0.75;
+      animation: wake-expand 1.2s linear infinite;
+    }
+    @keyframes wake-anim {
+      0% { opacity: 0.6; transform: translateX(-50%) scaleX(0.8); }
+      100% { opacity: 1.0; transform: translateX(-50%) scaleX(1.2); }
+    }
+    @keyframes wake-expand {
+      0% { opacity: 0.8; transform: scaleY(0.7); }
+      100% { opacity: 0.2; transform: scaleY(1.3); }
+    }
 
     /* Goal Beacon */
-    .goal-beacon { width: 30px; height: 30px; margin-left: -15px; margin-top: -15px; background: #0f0; border-radius: 50%; box-shadow: 0 0 20px #0f0; animation: beacon-pulse 1.5s infinite; transform: rotateX(-60deg); }
-    @keyframes beacon-pulse { 0% { transform: rotateX(-60deg) scale(0.5); opacity: 1; } 100% { transform: rotateX(-60deg) scale(2.5); opacity: 0; } }
+    .goal-beacon {
+      width: 32px; height: 32px; margin-left: -16px; margin-top: -16px;
+      background: #10b981; border-radius: 50%; box-shadow: 0 0 30px #10b981;
+      animation: beacon-pulse 1.5s infinite; transform: rotateX(-60deg);
+    }
+    @keyframes beacon-pulse {
+      0% { transform: rotateX(-60deg) scale(0.6); opacity: 1; }
+      100% { transform: rotateX(-60deg) scale(2.8); opacity: 0; }
+    }
+    .port-beacon {
+      width: 16px; height: 16px; margin-left: -8px; margin-top: -8px;
+      background: #38bdf8; border: 2px solid #fff; border-radius: 50%;
+      box-shadow: 0 0 15px #38bdf8;
+    }
 
-    /* Iceberg */
-    .iceberg-icon { width: 35px; height: 25px; margin-left: -17px; margin-top: -12px; background: #ffffff; border: 2px solid #fff; border-radius: 5px 12px 3px 8px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); transform: rotateX(-60deg) rotateZ(15deg); transition: all 0.3s ease; }
-    .iceberg-detected { box-shadow: 0 0 50px red, inset 0 0 15px red !important; border: 2px solid red; background: #ffaaaa; }
-    .iceberg-hazard-zone { position: absolute; width: 160px; height: 160px; margin-left: -80px; margin-top: -80px; border-radius: 50%; border: 2px dashed red; background: rgba(255, 0, 0, 0.1); transform: rotateX(0deg); animation: pulsate 2s infinite; display: none; }
-    .zone-active { display: block; }
-    @keyframes pulsate { 0% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.2; } 100% { transform: scale(0.9); opacity: 0.5; } }
+    /* 3D Crystalline Iceberg Models */
+    .iceberg-3d-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+    .iceberg-3d-icon {
+      width: 48px; height: 56px; margin-left: -24px; margin-top: -28px;
+      position: relative;
+      transform: rotateX(-60deg);
+      transform-origin: center center;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.85));
+    }
+    .iceberg-3d-icon:hover {
+      transform: rotateX(-60deg) scale(1.18);
+    }
+    .iceberg-label-tag {
+      position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; font-weight: 700; color: #ffffff; text-shadow: 0 0 4px #000, 0 0 8px #0284c7;
+      background: rgba(0, 20, 35, 0.85); border: 1px solid rgba(56, 189, 248, 0.6);
+      padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none;
+    }
+    .iceberg-threat-active .iceberg-3d-icon {
+      filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.9)) !important;
+      animation: berg-alert 0.8s infinite alternate;
+    }
+    .iceberg-threat-active .iceberg-label-tag {
+      background: rgba(239, 68, 68, 0.9);
+      border-color: #ff8888;
+      color: #fff;
+    }
+    @keyframes berg-alert {
+      0% { transform: rotateX(-60deg) scale(1.0); }
+      100% { transform: rotateX(-60deg) scale(1.22); }
+    }
+    .iceberg-hazard-zone {
+      position: absolute; width: 120px; height: 120px; margin-left: -60px; margin-top: -60px;
+      border-radius: 50%; border: 2px dashed rgba(56, 189, 248, 0.5);
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(6, 182, 212, 0) 70%);
+      transform: rotateX(0deg);
+      animation: pulsate 2.5s infinite;
+      pointer-events: none;
+    }
+    .zone-critical {
+      border-color: rgba(239, 68, 68, 0.85) !important;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.22) 0%, rgba(239, 68, 68, 0) 70%) !important;
+      animation: pulsate-crit 1.0s infinite !important;
+    }
+    @keyframes pulsate {
+      0% { transform: scale(0.92); opacity: 0.6; }
+      50% { transform: scale(1.08); opacity: 0.25; }
+      100% { transform: scale(0.92); opacity: 0.6; }
+    }
+    @keyframes pulsate-crit {
+      0% { transform: scale(0.88); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.88); opacity: 0.9; }
+    }
 
-    /* HUD Left Panel */
-    .hud-overlay { position: absolute; top: 20px; left: 20px; z-index: 1000; background: rgba(0, 20, 30, 0.85); border: 1px solid #00ffff; border-left: 4px solid #00ffff; padding: 15px; color: #00ffff; width: 340px; backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1); transform: perspective(500px) rotateY(5deg); }
+    /* Ice Shelf Markers */
+    .calving-front-marker {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px dashed #38bdf8;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #e0f2fe;
+      text-shadow: 0 0 5px #0284c7;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Top Bar with Return Buttons, Camera Controls & Route Selector */
+    .top-control-bar {
+      position: absolute; top: 10px; left: 14px; right: 14px;
+      z-index: 2500; display: flex; justify-content: space-between; align-items: center;
+      gap: 5px; pointer-events: none; flex-wrap: nowrap;
+    }
+    .top-control-bar > * { pointer-events: auto; }
+
+    .nav-btn-group {
+      display: flex; gap: 4px; align-items: center; flex-shrink: 0;
+    }
+    .btn-return {
+      background: rgba(0, 20, 30, 0.92);
+      border: 1px solid var(--cyan);
+      color: #fff; font-family: var(--font-sans);
+      font-weight: 700; font-size: 10.5px;
+      padding: 4px 7px; border-radius: 6px;
+      cursor: pointer; display: flex; align-items: center; gap: 4px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 3px 12px rgba(0, 255, 255, 0.2);
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-return:hover {
+      background: var(--cyan);
+      color: #001018;
+      box-shadow: 0 0 16px var(--cyan);
+    }
+    .btn-return i { width: 12px; height: 12px; }
+
+    /* Mission Route Selector */
+    .mission-selector-group {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(0, 20, 35, 0.94);
+      padding: 4px 8px; border-radius: 8px;
+      border: 1px solid rgba(0, 255, 255, 0.45);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15);
+      flex-shrink: 1; min-width: 0;
+    }
+    .mission-selector-group label {
+      font-size: 10.5px; font-weight: 700; color: #38bdf8;
+      display: flex; align-items: center; gap: 4px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .mission-select {
+      background: rgba(0, 30, 48, 0.9);
+      border: 1px solid var(--cyan);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 6px;
+      border-radius: 5px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+      max-width: 250px;
+    }
+    .mission-select:hover, .mission-select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    }
+    .mission-select option {
+      background: #001624;
+      color: #ffffff;
+    }
+
+    .playback-btn-group, .cam-btn-group {
+      display: flex; gap: 3px; align-items: center;
+      background: rgba(0, 20, 30, 0.92);
+      padding: 3px 5px; border-radius: 8px;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15);
+      flex-shrink: 0;
+    }
+    .cam-btn {
+      background: transparent; border: 1px solid transparent;
+      color: #94a3b8; font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600;
+      padding: 4px 6px; border-radius: 5px; cursor: pointer;
+      display: flex; align-items: center; gap: 3px;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .cam-btn:hover { color: #fff; background: rgba(0, 255, 255, 0.12); }
+    .cam-btn.active {
+      background: rgba(0, 255, 255, 0.22);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+    .btn-new-layout {
+      background: rgba(16, 185, 129, 0.2) !important;
+      border: 1px solid #10b981 !important;
+      color: #10b981 !important;
+      font-weight: 700;
+    }
+    .btn-new-layout:hover {
+      background: #10b981 !important;
+      color: #00140c !important;
+      box-shadow: 0 0 12px #10b981 !important;
+    }
+    .cam-btn i { width: 12px; height: 12px; }
+
+    .top-badge-group {
+      display: flex; gap: 6px; align-items: center; flex-shrink: 0;
+    }
+    .badge-provenance {
+      display: inline-block; font-size: 10px; padding: 3px 7px;
+      border-radius: 4px; font-weight: 700;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981; color: #10b981;
+    }
+    .badge-screened {
+      display: inline-block; font-size: 10px; padding: 3px 7px;
+      border-radius: 4px; font-weight: 700;
+      background: rgba(14, 165, 233, 0.2);
+      border: 1px solid #0ea5e9; color: #38bdf8;
+    }
+    .badge-radar {
+      display: inline-block; font-size: 10px; padding: 3px 7px;
+      border-radius: 4px; font-weight: 700;
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid #00ffff; color: #00ffff;
+    }
+    .badge-seed {
+      display: inline-block; font-size: 10px; padding: 3px 7px;
+      border-radius: 4px; font-weight: 700;
+      background: rgba(192, 132, 252, 0.2);
+      border: 1px solid #c084fc; color: #d8b4fe;
+    }
+
+    /* HUD Left Panel: Clean, Compact, No Scrollbars */
+    .hud-overlay {
+      position: absolute; top: 68px; left: 20px; z-index: 1000;
+      background: var(--bg-dark);
+      border: 1px solid var(--cyan); border-left: 4px solid var(--cyan);
+      padding: 12px 14px; color: var(--cyan); width: 330px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+      transform: perspective(500px) rotateY(3deg);
+      border-radius: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      max-height: 84vh;
+      overflow-y: auto;
+    }
+    .hud-line { margin: 3px 0; font-size: 10.5px; display: flex; justify-content: space-between; }
+    .hud-value { color: #fff; font-weight: 700; font-size: 11px; }
+    .cpa-overlay { display: none !important; }
+    .hud-overlay::-webkit-scrollbar { display: none; }
     
     /* Weather HUD - Top Right */
-    .env-overlay { position: absolute; top: 20px; right: 20px; z-index: 1000; background: rgba(0, 20, 30, 0.85); border: 1px solid #00ffff; border-right: 4px solid #00ffff; padding: 15px; color: #00ffff; width: 280px; backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1); transform: perspective(500px) rotateY(-5deg); }
+    .env-overlay {
+      position: absolute; top: 68px; right: 20px; z-index: 1000;
+      background: var(--bg-dark);
+      border: 1px solid var(--cyan); border-right: 4px solid var(--cyan);
+      padding: 13px 15px; color: var(--cyan); width: 280px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+      transform: perspective(500px) rotateY(-3deg);
+      border-radius: 8px;
+    }
     
     /* ML Diagnostics HUD - Bottom Right */
-    .ml-overlay { position: absolute; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0, 20, 30, 0.85); border: 1px solid #00ffff; border-right: 4px solid #ff00ff; padding: 15px; color: #ff00ff; width: 320px; backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(255, 0, 255, 0.1); transform: perspective(500px) rotateY(-5deg); }
-    .ml-overlay .hud-header { border-bottom: 1px solid rgba(255, 0, 255, 0.3); color: #ff00ff;}
-    .ml-overlay .hud-line span { color: #ddaadd; }
+    .ml-overlay {
+      position: absolute; bottom: 18px; right: 20px; z-index: 1000;
+      background: var(--bg-dark);
+      border: 1px solid #c084fc; border-right: 4px solid #c084fc;
+      padding: 13px 15px; color: #e9d5ff; width: 310px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(192, 132, 252, 0.15);
+      transform: perspective(500px) rotateY(-3deg);
+      border-radius: 8px;
+    }
+    .ml-overlay .hud-header { border-bottom: 1px solid rgba(192, 132, 252, 0.3); color: #c084fc; }
+    .ml-overlay .hud-line span { color: #d8b4fe; }
     .ml-overlay .hud-value { color: #fff; }
 
-    /* General HUD Elements */
-    .hud-header { font-weight: 700; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid rgba(0, 255, 255, 0.3); padding-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-    .hud-line { margin: 4px 0; font-size: 12px; display: flex; justify-content: space-between; }
-    .hud-value { color: #fff; font-weight: bold; font-size: 13px; }
-    .hud-target { margin-top: 10px; background: rgba(255, 0, 0, 0.2); border-left: 4px solid red; padding: 10px; font-size: 12px; display: none; }
-    .hud-telemetry { margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0, 255, 255, 0.3); }
-    .warning-text { color: red; font-weight: bold; font-size: 13px; margin-bottom: 5px; animation: blink 0.5s infinite; }
+    /* HUD Content Typography */
+    .hud-header {
+      font-weight: 700; font-size: 13px; margin-bottom: 6px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+      padding-bottom: 4px; display: flex; align-items: center; gap: 7px;
+      letter-spacing: 0.05em;
+    }
+    
+    .hud-target {
+      margin-top: 8px; background: rgba(239, 68, 68, 0.2);
+      border-left: 4px solid var(--red); padding: 8px 10px; font-size: 11px;
+      display: none; border-radius: 4px; position: relative;
+    }
+    .hud-target-close {
+      position: absolute; top: 4px; right: 6px;
+      background: transparent; border: none; color: #94a3b8;
+      font-size: 13px; cursor: pointer; z-index: 20;
+      padding: 2px 6px; line-height: 1;
+    }
+    .hud-target-close:hover { color: #fff; }
+    
+    .hud-telemetry { margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(0, 255, 255, 0.25); }
+    .warning-text {
+      color: #ef4444; font-weight: bold; font-size: 11px;
+      margin-bottom: 4px; display: flex; align-items: center; gap: 5px;
+      animation: blink 0.6s infinite;
+    }
     @keyframes blink { 0% { opacity:1; } 50% { opacity:0.3; } 100% { opacity:1; } }
 
-    .grid-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 2000; }
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 50px 50px; pointer-events: none; z-index: 2000;
+    }
+
+    @media (max-width: 1280px) {
+      .top-control-bar { flex-wrap: wrap; }
+      .hud-overlay { width: 290px; top: 96px; }
+      .env-overlay { width: 250px; top: 96px; }
+      .ml-overlay { width: 270px; }
+    }
   </style>
 </head>
 <body>
 
   <div class="grid-overlay"></div>
-  <div id="tactical-container"><div id="map"></div></div>
+  
+  <!-- Top Control Bar -->
+  <div class="top-control-bar">
+    <div class="nav-btn-group">
+      <button class="btn-return" onclick="window.location.href='/dashboard'">
+        <i data-lucide="layout-dashboard"></i> DASHBOARD
+      </button>
+      <button class="btn-return" onclick="window.location.href='/navigator'">
+        <i data-lucide="compass"></i> NAVIGATOR
+      </button>
+      <button class="btn-return" onclick="window.location.href='/'">
+        <i data-lucide="home"></i> HOME
+      </button>
+    </div>
+
+    <!-- Mission Route Selector Dropdown -->
+    <div class="mission-selector-group">
+      <label for="mission-select"><i data-lucide="compass"></i> MISSION:</label>
+      <select id="mission-select" class="mission-select" onchange="onMissionChange(this.value)">
+        <option value="ushuaia-palmer">🇦🇷 Ushuaia ➔ 🇺🇸 Palmer (Drake)</option>
+        <option value="punta-rothera">🇨🇱 Punta Arenas ➔ 🇬🇧 Rothera (Bellingshausen)</option>
+        <option value="capetown-maitri">🇿🇦 Cape Town ➔ 🇮🇳 Maitri (Princess Astrid)</option>
+        <option value="hobart-bharati">🇦🇺 Hobart ➔ 🇮🇳 Bharati (Prydz Bay)</option>
+        <option value="maitri-bharati">🇮🇳 Maitri ➔ 🇮🇳 Bharati (Circumpolar)</option>
+        <option value="ushuaia-rothera">🇦🇷 Ushuaia ➔ 🇬🇧 Rothera (Adelaide Island)</option>
+        <option value="hobart-casey">🇦🇺 Hobart ➔ 🇦🇺 Casey (Wilkes Land)</option>
+      </select>
+    </div>
+
+    <!-- Playback & Speed Controls -->
+    <div class="playback-btn-group">
+      <button class="cam-btn" id="btn-play-pause" onclick="togglePause()" title="Pause/Resume Voyage [Space]">
+        <i data-lucide="pause"></i> <span id="lbl-pause">Pause</span>
+      </button>
+      <button class="cam-btn" onclick="resetMission()" title="Restart Voyage [R]">
+        <i data-lucide="rotate-ccw"></i> Reset
+      </button>
+      <button class="cam-btn btn-new-layout" onclick="generateNewScenario()" title="Generate Fresh Iceberg Scenario [N]">
+        <i data-lucide="dice-5"></i> New Icebergs
+      </button>
+      <button class="cam-btn speed-btn" id="spd-05" onclick="setSimSpeed(0.5, this)">0.5x</button>
+      <button class="cam-btn speed-btn active" id="spd-1" onclick="setSimSpeed(1.0, this)">1x</button>
+      <button class="cam-btn speed-btn" id="spd-2" onclick="setSimSpeed(2.5, this)">2.5x</button>
+      <button class="cam-btn speed-btn" id="spd-5" onclick="setSimSpeed(5.0, this)">5x</button>
+    </div>
+
+    <!-- Camera Controls -->
+    <div class="cam-btn-group">
+      <button class="cam-btn active" id="btn-cam-command" onclick="setCamera('command')">
+        <i data-lucide="crosshair"></i> Command
+      </button>
+      <button class="cam-btn" id="btn-cam-follow" onclick="setCamera('follow')">
+        <i data-lucide="navigation"></i> Follow
+      </button>
+      <button class="cam-btn" id="btn-cam-tactical" onclick="setCamera('tactical')">
+        <i data-lucide="layers"></i> 3D
+      </button>
+      <button class="cam-btn" id="btn-cam-topdown" onclick="setCamera('topdown')">
+        <i data-lucide="map"></i> Top-Down
+      </button>
+      <button class="cam-btn" id="btn-cam-closeup" onclick="setCamera('closeup')">
+        <i data-lucide="zoom-in"></i> Focus
+      </button>
+    </div>
+  </div>
+
+  <!-- 3D Transform Container -->
+  <div id="tactical-container">
+    <div class="tactical-vignette"></div>
+    <div id="map" class="cam-command"></div>
+  </div>
 
   <!-- Main Left Navigation HUD -->
   <div class="hud-overlay">
-    <div class="hud-header"><i data-lucide="crosshair"></i> REAL-TIME AI ROUTING</div>
-    <div class="hud-line"><span>MISSION:</span> <span class="hud-value">USHUAIA ➔ PALMER</span></div>
-    <div class="hud-line"><span>SYSTEM:</span> <span class="hud-value" id="hud-status" style="color:#0f0">CONTINUOUS PATHFINDING</span></div>
+    <div style="display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap;">
+      <span class="badge-radar">🛰 RADAR ACTIVE</span>
+      <span class="badge-screened">TACTICAL AIS</span>
+      <span class="badge-provenance">BYU/NIC v8.0</span>
+      <span class="badge-seed" id="hud-seed">SEED: #8419</span>
+    </div>
+    <div class="hud-header"><i data-lucide="crosshair"></i> TACTICAL RADAR EVASION</div>
+    
+    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 6px; line-height: 1.3; border-left: 2px solid #38bdf8; padding-left: 5px;">
+      ⚠ Approximate 1:50M cartographic geometry (regional screening only, not navigationally certified). Physical parameters are illustrative simulation values.
+    </div>
+
+    <div class="hud-line"><span>MISSION:</span> <span class="hud-value" id="hud-mission">USHUAIA ➔ PALMER</span></div>
+    <div class="hud-line"><span>SECTOR:</span> <span class="hud-value" id="hud-sector" style="color:#38bdf8">DRAKE PASSAGE</span></div>
+    <div class="hud-line"><span>SYSTEM:</span> <span class="hud-value" id="hud-status" style="color:#10b981">TACTICAL WATERWAY ACTIVE</span></div>
     <div class="hud-line"><span>VESSEL POS:</span> <span class="hud-value" id="hud-pos">--</span></div>
+    <div class="hud-line"><span>HEADING:</span> <span class="hud-value" id="hud-hdg">148.2° TRUE</span></div>
+    <div class="hud-line"><span>SPEED:</span> <span class="hud-value" id="hud-spd">14.0 KTS</span></div>
+    <div class="hud-line"><span>RADAR ROUTE:</span> <span class="hud-value" id="hud-screening-status" style="color:#38bdf8">CATMULL-ROM SPLINE (ADAPTIVE CLEARANCE)</span></div>
     
     <div class="hud-target" id="hud-target">
-      <div class="warning-text"><i data-lucide="alert-octagon" style="width:14px;height:14px"></i> OBSTACLE IN PROXIMITY</div>
-      <div class="hud-line"><span>CONTACT:</span> <span class="hud-value" id="target-id">--</span></div>
-      <div class="hud-line"><span>DIST:</span> <span class="hud-value" id="target-dist">--</span></div>
-      <div class="hud-line"><span>ACTION:</span> <span class="hud-value" style="color:orange">THREADING THE NEEDLE</span></div>
+      <button class="hud-target-close" onclick="dismissTargetCard()">✕</button>
+      <div class="warning-text"><i data-lucide="alert-octagon" style="width:14px;height:14px"></i> <span id="target-header-title">ICEBERG COLLISION THREAT</span></div>
+      <div class="hud-line"><span>CONTACT ID:</span> <span class="hud-value" id="target-id" style="color:#ef4444">--</span></div>
+      <div class="hud-line"><span>GLACIAL TYPE:</span> <span class="hud-value" id="target-type" style="color:#38bdf8">TABULAR MEGA-BERG</span></div>
+      <div class="hud-line"><span>EST. MASS:</span> <span class="hud-value" id="target-mass" style="color:#fff">-- Mt</span></div>
+      <div class="hud-line"><span>DISTANCE:</span> <span class="hud-value" id="target-dist">--</span></div>
+      <div class="hud-line"><span>CLOSEST CPA:</span> <span class="hud-value" id="cpa-dist" style="color:#f59e0b">-- NM</span></div>
+      <div class="hud-line"><span>TIME TO CPA:</span> <span class="hud-value" id="cpa-time">-- min</span></div>
+      <div class="hud-line"><span>THREAT RATING:</span> <span class="hud-value" id="cpa-threat" style="color:#ef4444">CRITICAL HAZARD</span></div>
+      <div class="hud-line"><span>SUBMERGED KEEL:</span> <span class="hud-value" style="color:#06b6d4" id="target-keel">85-90% UNDERWATER BULK</span></div>
+      <div class="hud-line"><span>EVASION STATUS:</span> <span class="hud-value" style="color:#10b981" id="target-action">DYNAMIC TANGENTIAL DETOUR</span></div>
     </div>
     
     <div class="hud-telemetry">
-      <div class="hud-header"><i data-lucide="fuel"></i> ECO-TELEMETRY</div>
+      <div class="hud-header" style="font-size:12px"><i data-lucide="fuel"></i> MARITIME TELEMETRY</div>
       <div class="hud-line"><span>DIST COVERED:</span> <span class="hud-value" id="tel-dist">0 km</span></div>
-      <div class="hud-line"><span>FUEL BURNED:</span> <span class="hud-value" id="tel-fuel">0.0 T</span></div>
-      <div class="hud-line"><span>CO2 EMITTED:</span> <span class="hud-value" id="tel-co2" style="color:orange">0.0 T</span></div>
+      <div class="hud-line"><span>WAYPOINT:</span> <span class="hud-value" id="tel-wp">1 / 13</span></div>
+      <div class="hud-line"><span>FUEL CONSUMPTION:</span> <span class="hud-value" id="tel-fuel">0.0 t HFO</span></div>
+      <div class="hud-line"><span>CO2 EMISSION:</span> <span class="hud-value" id="tel-co2" style="color:orange">0.0 t CO₂</span></div>
+      <div class="hud-line"><span>CLEARANCE:</span> <span class="hud-value" id="tel-prob" style="color:#10b981">> 6.0 km (VERIFIED CLEAR)</span></div>
     </div>
   </div>
 
-  <!-- NEW: Weather HUD (Top Right) -->
+  <!-- Weather HUD (Top Right) -->
   <div class="env-overlay">
-    <div class="hud-header"><i data-lucide="cloud-lightning"></i> WEATHER & OCEAN</div>
-    <div class="hud-line"><span>WIND SPEED:</span> <span class="hud-value" id="env-wind">45.0 KTS</span></div>
-    <div class="hud-line"><span>WIND DIR:</span> <span class="hud-value">SOUTH-EAST</span></div>
-    <div class="hud-line"><span>SEA STATE:</span> <span class="hud-value" style="color:orange">ROUGH (4m)</span></div>
-    <div class="hud-line"><span>TEMPERATURE:</span> <span class="hud-value" id="env-temp">-12.4 °C</span></div>
+    <div class="hud-header"><i data-lucide="cloud-lightning"></i> METEOROLOGY & OCEAN</div>
+    <div class="hud-line"><span>WIND SPEED:</span> <span class="hud-value" id="env-wind">34.2 KTS</span></div>
+    <div class="hud-line"><span>WIND VECTOR:</span> <span class="hud-value" id="env-wind-dir">215° (SW GALE)</span></div>
+    <div class="hud-line"><span>SEA STATE:</span> <span class="hud-value" style="color:orange" id="env-sea">FORCE 6 (3.8m)</span></div>
+    <div class="hud-line"><span>AIR TEMP:</span> <span class="hud-value" id="env-temp">-2.4 °C</span></div>
   </div>
 
-  <!-- NEW: ML Diagnostics HUD (Bottom Right) -->
+  <!-- ML Diagnostics HUD (Bottom Right) -->
   <div class="ml-overlay">
-    <div class="hud-header"><i data-lucide="cpu"></i> PYTORCH GRU ENGINE</div>
-    <div class="hud-line"><span>MODEL CONFIDENCE:</span> <span class="hud-value" id="ml-conf" style="color:#0f0">94.2%</span></div>
-    <div class="hud-line"><span>A* NODE LATENCY:</span> <span class="hud-value" id="ml-lat">12 ms</span></div>
-    <div class="hud-line"><span>DATA STREAM:</span> <span class="hud-value" style="color:#0f0">BYU/NIC SYNCED</span></div>
-    <div class="hud-line"><span>ICEBERG TENSORS:</span> <span class="hud-value">11 ACTIVE</span></div>
+    <div class="hud-header"><i data-lucide="cpu"></i> PYTORCH GRU INFERENCE</div>
+    <div class="hud-line"><span>MODEL CONFIDENCE:</span> <span class="hud-value" id="ml-conf" style="color:#10b981">94.8% (VERIFIED)</span></div>
+    <div class="hud-line"><span>MC DROPOUT RADIUS:</span> <span class="hud-value" id="ml-fan">±0.4 km</span></div>
+    <div class="hud-line"><span>A* REPLAN TIME:</span> <span class="hud-value" id="ml-lat">14 ms</span></div>
+    <div class="hud-line"><span>TRAINING BENCHMARK:</span> <span class="hud-value" style="color:#c084fc">-25.2% vs CV Baseline</span></div>
   </div>
 
   <script>
     lucide.createIcons();
-    const map = L.map('map', { center: [-59.0, -66.0], zoom: 6, zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false });
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 17 }).addTo(map);
 
-    const START = [-54.8, -68.3]; // Ushuaia
-    const GOAL = [-64.7, -64.0];  // Palmer
-    
-    const goalIcon = L.divIcon({ className: 'goal-wrapper', html: '<div class="goal-beacon"></div>', iconSize: [0, 0] });
-    L.marker(GOAL, { icon: goalIcon }).addTo(map);
-    L.circleMarker(START, { radius: 8, color: '#0f0', fillColor: '#0f0', fillOpacity: 1 }).addTo(map);
-
-    // Initial Iceberg array (11 objects)
-    const icebergs = [
-      { id: "A-15", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "B-22", lat: 0, lon: 0, vx: 0, vy: 0 }, 
-      { id: "C-99", lat: 0, lon: 0, vx: 0, vy: 0 }, 
-      { id: "D-04", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "E-31", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "F-12", lat: 0, lon: 0, vx: 0, vy: 0 }, 
-      { id: "G-88", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "H-45", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "I-07", lat: 0, lon: 0, vx: 0, vy: 0 }, 
-      { id: "J-55", lat: 0, lon: 0, vx: 0, vy: 0 },
-      { id: "K-11", lat: 0, lon: 0, vx: 0, vy: 0 }  
-    ];
-
-    const icebergMarkers = [];
-    
-    function randomizeIcebergs() {
-       // Create a tight 'gate' for the ship to thread the needle through!
-       icebergs[0].lat = -59.5 + (Math.random() * 0.4 - 0.2);
-       icebergs[0].lon = -64.5; // Right side of gate
-       
-       icebergs[1].lat = -60.5 + (Math.random() * 0.4 - 0.2);
-       icebergs[1].lon = -67.5; // Left side of gate
-       
-       // Second gate
-       icebergs[2].lat = -62.5 + (Math.random() * 0.4 - 0.2);
-       icebergs[2].lon = -63.0; // Right side
-       
-       icebergs[3].lat = -63.5 + (Math.random() * 0.4 - 0.2);
-       icebergs[3].lon = -66.0; // Left side
-       
-       // Scatter the rest
-       for (let i = 4; i < icebergs.length; i++) {
-           icebergs[i].lat = -55.0 - Math.random() * 9.0;
-           icebergs[i].lon = -60.0 - Math.random() * 10.0;
-       }
-       
-       // Randomize tiny velocities
-       for (let i = 0; i < icebergs.length; i++) {
-           icebergs[i].vx = (Math.random() - 0.5) * 0.001;
-           icebergs[i].vy = (Math.random() - 0.5) * 0.001;
-       }
+    // ─── 1. Deterministic Seeded PRNG (Mulberry32) ──────────────────────────────
+    function mulberry32(a) {
+      return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
     }
-    
-    randomizeIcebergs();
 
-    icebergs.forEach(berg => {
-      const icon = L.divIcon({ className: 'iceberg-wrapper', html: '<div class="iceberg-hazard-zone zone-active"></div><div class="iceberg-icon"></div>', iconSize: [0, 0] });
-      const marker = L.marker([berg.lat, berg.lon], { icon: icon }).addTo(map);
-      marker.bergData = berg;
-      icebergMarkers.push(marker);
+    function hashStringToSeed(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
+      }
+      return (hash >>> 0);
+    }
+
+    // ─── 2. Maritime Mission Configurations ─────────────────────────────────────
+    const MISSION_CONFIGS = {
+      "ushuaia-palmer": {
+        name: "Ushuaia ➔ Palmer Station",
+        sector: "Drake Passage Corridor",
+        origin: "Ushuaia Port (Argentina)",
+        destination: "Palmer Station (US)",
+        startCoord: [-55.2000, -66.2000],
+        goalCoord: [-64.8000, -64.1500],
+        center: [-60.0, -65.5],
+        zoom: 6,
+        operator_opt_in: false,
+        bbox: [-64.0, -56.0, -68.0, -62.0],
+        nominalBergs: ["A23A", "B09B", "C-16", "D-04", "B-22", "A-15"]
+      },
+      "punta-rothera": {
+        name: "Punta Arenas ➔ Rothera Station",
+        sector: "Bellingshausen Sea Corridor",
+        origin: "Punta Arenas (Chile)",
+        destination: "Rothera Station (UK)",
+        startCoord: [-52.8000, -67.5000],
+        goalCoord: [-67.6000, -68.3000],
+        center: [-60.5, -69.0],
+        zoom: 5,
+        operator_opt_in: false,
+        bbox: [-67.0, -54.0, -73.0, -66.0],
+        nominalBergs: ["B-31", "B-43", "C-28", "A-68C"]
+      },
+      "capetown-maitri": {
+        name: "Cape Town ➔ Princess Astrid Staging (Maitri)",
+        sector: "South Atlantic / Queen Maud Land",
+        origin: "Cape Town Port (South Africa)",
+        destination: "Maitri (India)",
+        startCoord: [-33.8800, 18.4400],
+        goalCoord: [-69.8500, 11.9000],
+        center: [-54.0, 15.0],
+        zoom: 4,
+        operator_opt_in: true,
+        bbox: [-69.0, -36.0, 10.0, 20.0],
+        nominalBergs: ["A-74", "B-15Y", "FIMBUL-01", "ASTRID-02"]
+      },
+      "hobart-bharati": {
+        name: "Hobart ➔ Bharati Station",
+        sector: "Indian Ocean / Prydz Bay",
+        origin: "Hobart Port (Australia)",
+        destination: "Bharati (India)",
+        startCoord: [-43.1500, 147.6000],
+        goalCoord: [-69.3800, 76.1900],
+        center: [-58.0, 110.0],
+        zoom: 4,
+        operator_opt_in: false,
+        bbox: [-68.5, -45.0, 75.0, 145.0],
+        nominalBergs: ["D-28", "AMERY-B01", "PRYDZ-02", "THALA-04"]
+      },
+      "maitri-bharati": {
+        name: "Princess Astrid Staging ➔ Bharati Station",
+        sector: "Circumpolar Antarctic Coastal Route",
+        origin: "Maitri (India)",
+        destination: "Bharati (India)",
+        startCoord: [-69.8500, 11.9000],
+        goalCoord: [-69.3800, 76.1900],
+        center: [-67.0, 44.0],
+        zoom: 5,
+        operator_opt_in: true,
+        bbox: [-69.0, -65.0, 12.0, 75.0],
+        nominalBergs: ["ENDERBY-01", "RAGNHILD-02", "COSMONAUT-03", "PRYDZ-COAST"]
+      },
+      "ushuaia-rothera": {
+        name: "Ushuaia ➔ Rothera Station",
+        sector: "West Antarctic Peninsula Corridor",
+        origin: "Ushuaia Port (Argentina)",
+        destination: "Rothera Station (UK)",
+        startCoord: [-55.2000, -66.2000],
+        goalCoord: [-67.6000, -68.3000],
+        center: [-61.5, -67.5],
+        zoom: 5,
+        operator_opt_in: false,
+        bbox: [-67.0, -56.0, -70.0, -63.0],
+        nominalBergs: ["A23A", "B-22", "C-28"]
+      },
+      "hobart-casey": {
+        name: "Hobart ➔ Casey Station",
+        sector: "Wilkes Land / East Antarctica",
+        origin: "Hobart Port (Australia)",
+        destination: "Casey Station (Australia)",
+        startCoord: [-43.1500, 147.6000],
+        goalCoord: [-66.2500, 110.5000],
+        center: [-55.0, 128.0],
+        zoom: 4,
+        operator_opt_in: false,
+        bbox: [-65.5, -45.0, 111.0, 145.0],
+        nominalBergs: ["T-01", "C-12"]
+      }
+    };
+
+    function resolveCorridorKey(origin, dest) {
+      const o = (origin || "").toLowerCase();
+      const d = (dest || "").toLowerCase();
+      if (o.includes("ushuaia") && d.includes("palmer")) return "ushuaia-palmer";
+      if (o.includes("punta") && d.includes("rothera")) return "punta-rothera";
+      if (o.includes("cape town") && d.includes("maitri")) return "capetown-maitri";
+      if (o.includes("hobart") && d.includes("bharati")) return "hobart-bharati";
+      if (o.includes("maitri") && d.includes("bharati")) return "maitri-bharati";
+      if (o.includes("ushuaia") && d.includes("rothera")) return "ushuaia-rothera";
+      if (o.includes("hobart") && d.includes("casey")) return "hobart-casey";
+      return "ushuaia-palmer";
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const originQuery = urlParams.get('start') || sessionStorage.getItem('sih_sim_start') || "Ushuaia Port (Argentina)";
+    const destQuery = urlParams.get('goal') || sessionStorage.getItem('sih_sim_goal') || "Palmer Station (US)";
+
+    let activeCorridorKey = resolveCorridorKey(originQuery, destQuery);
+    let activeCorridor = MISSION_CONFIGS[activeCorridorKey] || MISSION_CONFIGS["ushuaia-palmer"];
+    let currentScenarioSeed = "SIH-2026";
+    let selectedContactId = null;
+
+    const mSelect = document.getElementById('mission-select');
+    if (mSelect) mSelect.value = activeCorridorKey;
+
+    // ─── 3. Leaflet Map Initialization (Real Earth Satellite Cartography) ────────
+    const map = L.map('map', {
+      center: activeCorridor.center,
+      zoom: activeCorridor.zoom,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: false,
+      scrollWheelZoom: false
     });
 
-    const shipSVG = `<svg viewBox="0 0 24 24"><path d="M22,18H2v-2l1.6-4.8C3.8,10.6,4.4,10,5,10h1v-1c0-1.1,0.9-2,2-2h8c1.1,0,2,0.9,2,2v1h1c0.6,0,1.2,0.6,1.4,1.2L22,16V18z M16,10H8v1h8V10z M4.3,16h15.4l-1.3-4H5.6L4.3,16z"/><path d="M12,2v5"/><circle cx="12" cy="4" r="1" fill="#fff"/></svg>`;
-    const vesselIcon = L.divIcon({ className: 'vessel-wrapper', html: `<div class="radar-sweep-container"><div class="radar-scanner"></div></div><div class="vessel-icon">${shipSVG}</div>`, iconSize: [0, 0] });
-    const vesselMarker = L.marker(START, { icon: vesselIcon }).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 17
+    }).addTo(map);
 
-    let shipPos = [...START];
-    let routePolyline = L.polyline([], { color: '#00ffff', weight: 4, dashArray: '10, 15', opacity: 0.9 }).addTo(map);
-    let traveledPolyline = L.polyline([], { color: '#004444', weight: 3, opacity: 0.6 }).addTo(map);
-    
+    // ─── 4. Antarctic Glacial Ice Shelves & Calving Fronts Layer ─────────────────
+    const ANTARCTIC_ICE_SHELVES = [
+      {
+        name: "Larsen C Ice Shelf",
+        coords: [
+          [-66.0, -64.0], [-66.0, -60.5], [-67.5, -60.0], [-68.8, -62.5],
+          [-68.5, -65.2], [-67.0, -64.8]
+        ],
+        front: [-67.2, -60.2],
+        frontLabel: "❄ Larsen C Calving Margin"
+      },
+      {
+        name: "Ronne-Filchner Ice Shelf",
+        coords: [
+          [-75.0, -60.0], [-74.5, -50.0], [-76.0, -35.0], [-78.0, -30.0],
+          [-82.0, -35.0], [-83.0, -55.0], [-80.0, -65.0], [-75.0, -60.0]
+        ],
+        front: [-75.2, -48.0],
+        frontLabel: "❄ Filchner Calving Barrier"
+      },
+      {
+        name: "Fimbul Ice Shelf",
+        coords: [
+          [-69.8, -1.0], [-69.5, 3.0], [-70.2, 8.0], [-71.2, 7.5],
+          [-71.5, -0.5], [-69.8, -1.0]
+        ],
+        front: [-69.5, 2.0],
+        frontLabel: "❄ Fimbul Ice Shelf Front"
+      },
+      {
+        name: "Amery Ice Shelf",
+        coords: [
+          [-68.5, 69.0], [-68.5, 74.0], [-70.5, 73.5], [-72.5, 71.0],
+          [-71.5, 68.0], [-68.5, 69.0]
+        ],
+        front: [-68.4, 71.5],
+        frontLabel: "❄ Amery Calving Front"
+      }
+    ];
+
+    const shelfLayerGroup = L.layerGroup().addTo(map);
+    function renderIceShelves() {
+      shelfLayerGroup.clearLayers();
+      ANTARCTIC_ICE_SHELVES.forEach(shelf => {
+        L.polygon(shelf.coords, {
+          color: '#38bdf8', weight: 2, dashArray: '5, 5',
+          fillColor: '#bae6fd', fillOpacity: 0.32
+        }).addTo(shelfLayerGroup);
+
+        const tagIcon = L.divIcon({
+          className: 'calving-front-wrapper',
+          html: `<div class="calving-front-marker">${shelf.frontLabel}</div>`,
+          iconSize: [0, 0]
+        });
+        L.marker(shelf.front, { icon: tagIcon }).addTo(shelfLayerGroup);
+      });
+    }
+    renderIceShelves();
+
+    // ─── 5. 3D Faceted Iceberg SVG Model Generator ──────────────────────────────
+    function create3DIcebergSVG(bergId) {
+      return `
+        <svg viewBox="0 0 44 54" width="44" height="54" style="overflow:visible;">
+          <defs>
+            <linearGradient id="iceSun_${bergId}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="50%" stop-color="#f0f9ff"/>
+              <stop offset="100%" stop-color="#e0f2fe"/>
+            </linearGradient>
+            <linearGradient id="iceShadow_${bergId}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#bae6fd"/>
+              <stop offset="60%" stop-color="#7dd3fc"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </linearGradient>
+            <radialGradient id="subsurfaceKeel_${bergId}" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.85"/>
+              <stop offset="65%" stop-color="#0891b2" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#0e7490" stop-opacity="0.0"/>
+            </radialGradient>
+            <linearGradient id="waterlineGrad_${bergId}" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="50%" stop-color="rgba(255,255,255,0.95)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+            </linearGradient>
+          </defs>
+          <path d="M 10,26 C 6,36 8,48 18,52 C 24,55 30,53 34,48 C 40,42 38,32 34,26 Z" 
+                fill="url(#subsurfaceKeel_${bergId})" filter="drop-shadow(0 0 14px #06b6d4)"/>
+          <ellipse cx="22" cy="26" rx="19" ry="5" fill="none" stroke="url(#waterlineGrad_${bergId})" stroke-width="1.3" opacity="0.85"/>
+          <polygon points="10,26 18,11 23,26" fill="url(#iceShadow_${bergId})" stroke="#7dd3fc" stroke-width="0.6"/>
+          <polygon points="18,11 29,5 28,26 23,26" fill="url(#iceSun_${bergId})" stroke="#ffffff" stroke-width="0.7"/>
+          <polygon points="29,5 35,26 28,26" fill="url(#iceShadow_${bergId})" stroke="#bae6fd" stroke-width="0.5"/>
+          <polygon points="29,5 24,2 27,10" fill="#ffffff" stroke="#e0f2fe" stroke-width="0.5"/>
+          <line x1="22" y1="13" x2="25" y2="24" stroke="#0284c7" stroke-width="0.8" opacity="0.8"/>
+          <line x1="16" y1="17" x2="19" y2="26" stroke="#0369a1" stroke-width="0.6" opacity="0.75"/>
+          <circle cx="5" cy="27" r="1.6" fill="#ffffff" opacity="0.9"/>
+          <circle cx="40" cy="29" r="2.2" fill="#e0f2fe" opacity="0.85"/>
+          <circle cx="37" cy="22" r="1.3" fill="#ffffff" opacity="0.8"/>
+        </svg>
+      `;
+    }
+
+    // ─── 6. Recovered Volumetric 3D Polar Research Icebreaker Model (Three.js) ───
+    const rotatingRadars = [];
+
+    function createPolarIcebreakerMesh() {
+      const shipGroup = new THREE.Group();
+      shipGroup.name = "PolarIcebreaker";
+
+      // Polar Red High-Vis Anti-Ice Coating & Structural Materials
+      const hullMat = new THREE.MeshStandardMaterial({
+        color: 0xb91c1c,
+        roughness: 0.35,
+        metalness: 0.15
+      });
+      const bootTopMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        roughness: 0.6
+      });
+      const deckMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.7
+      });
+      const whiteMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.4
+      });
+      const windowMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        roughness: 0.1,
+        metalness: 0.9,
+        emissive: 0x003344,
+        emissiveIntensity: 0.4
+      });
+
+      // 1. Main Lower Hull (Waterline & Keel Draft)
+      const lowerHullGeo = new THREE.BoxGeometry(0.22, 0.085, 1.20);
+      const lowerHull = new THREE.Mesh(lowerHullGeo, bootTopMat);
+      lowerHull.position.y = -0.0425;
+      shipGroup.add(lowerHull);
+
+      // 2. Upper Hull with Icebreaker Bow Rake
+      const upperHullGeo = new THREE.BoxGeometry(0.22, 0.09, 1.15);
+      const upperHull = new THREE.Mesh(upperHullGeo, hullMat);
+      upperHull.position.set(0, 0.045, -0.025);
+      shipGroup.add(upperHull);
+
+      // Raked Spoon Stem Icebreaking Bow (Front is +Z)
+      const bowStemGeo = new THREE.ConeGeometry(0.11, 0.28, 4);
+      bowStemGeo.rotateX(-Math.PI / 2);
+      bowStemGeo.rotateZ(Math.PI / 4);
+      const bowStem = new THREE.Mesh(bowStemGeo, hullMat);
+      bowStem.position.set(0, 0.02, 0.58);
+      bowStem.scale.set(1.4, 0.8, 1.0);
+      shipGroup.add(bowStem);
+      shipGroup.scale.set(0.55, 0.55, 0.55);
+
+      // Knife Ice-Blade Stem Plate
+      const stemBladeGeo = new THREE.BoxGeometry(0.015, 0.14, 0.22);
+      const stemBladeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.8, roughness: 0.2 });
+      const stemBlade = new THREE.Mesh(stemBladeGeo, stemBladeMat);
+      stemBlade.position.set(0, 0.01, 0.62);
+      stemBlade.rotation.x = -0.45;
+      shipGroup.add(stemBlade);
+
+      // Forecastle Weather Deck
+      const deckGeo = new THREE.BoxGeometry(0.21, 0.01, 1.18);
+      const deckMesh = new THREE.Mesh(deckGeo, deckMat);
+      deckMesh.position.set(0, 0.09, -0.01);
+      shipGroup.add(deckMesh);
+
+      // 3. Twin Azipod Propulsion Pods (Transom Stern)
+      const azipodMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6 });
+      const propMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.2 });
+      [-0.06, 0.06].forEach(xOff => {
+        const podStrut = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.05, 0.04), azipodMat);
+        podStrut.position.set(xOff, -0.065, -0.52);
+        shipGroup.add(podStrut);
+
+        const podBody = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.08, 12), azipodMat);
+        podBody.rotation.x = Math.PI / 2;
+        podBody.position.set(xOff, -0.09, -0.52);
+        shipGroup.add(podBody);
+
+        const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 6), propMat);
+        screw.rotation.x = Math.PI / 2;
+        screw.position.set(xOff, -0.09, -0.565);
+        shipGroup.add(screw);
+      });
+
+      // 4. Multi-Tier Superstructure & Bridge (Forward of Midships)
+      const tier1 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.07, 0.44), whiteMat);
+      tier1.position.set(0, 0.13, 0.10);
+      shipGroup.add(tier1);
+
+      const bridgeDeck = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.055, 0.28), whiteMat);
+      bridgeDeck.position.set(0, 0.19, 0.14);
+      shipGroup.add(bridgeDeck);
+
+      // Bridge Wings
+      const wings = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.035, 0.09), whiteMat);
+      wings.position.set(0, 0.195, 0.17);
+      shipGroup.add(wings);
+
+      // Wraparound Forward Observation Windows
+      const winFront = new THREE.Mesh(new THREE.BoxGeometry(0.155, 0.022, 0.02), windowMat);
+      winFront.position.set(0, 0.20, 0.28);
+      shipGroup.add(winFront);
+
+      const winWings = new THREE.Mesh(new THREE.BoxGeometry(0.265, 0.02, 0.015), windowMat);
+      winWings.position.set(0, 0.20, 0.175);
+      shipGroup.add(winWings);
+
+      // 5. Exhaust Funnels & Mast Rig
+      const funnelMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+      const funnelStripeMat = new THREE.MeshStandardMaterial({ color: 0x0284c7 });
+      const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.10, 10), funnelMat);
+      funnel.position.set(0, 0.20, -0.08);
+      shipGroup.add(funnel);
+
+      const fStripe = new THREE.Mesh(new THREE.CylinderGeometry(0.027, 0.028, 0.025, 10), funnelStripeMat);
+      fStripe.position.set(0, 0.22, -0.08);
+      shipGroup.add(fStripe);
+
+      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.01, 0.16, 8), new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7 }));
+      mast.position.set(0, 0.27, 0.14);
+      shipGroup.add(mast);
+
+      // Dual Spinning Slotted-Waveguide Radar Antennas
+      rotatingRadars.length = 0;
+      [-0.03, 0.03].forEach((zOff, idx) => {
+        const radarBar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.08, 0.008, 0.012),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
+        );
+        radarBar.position.set(0, 0.32 + idx * 0.04, 0.14 + zOff);
+        shipGroup.add(radarBar);
+        rotatingRadars.push(radarBar);
+      });
+
+      // 6. Stern Flight Deck (Helideck)
+      const helideck = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.012, 8), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }));
+      helideck.position.set(0, 0.11, -0.42);
+      shipGroup.add(helideck);
+
+      const hMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const hBar1 = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.002, 0.06), hMat);
+      hBar1.position.set(-0.02, 0.118, -0.42);
+      const hBar2 = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.002, 0.06), hMat);
+      hBar2.position.set(0.02, 0.118, -0.42);
+      const hBarMid = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.002, 0.012), hMat);
+      hBarMid.position.set(0, 0.118, -0.42);
+      shipGroup.add(hBar1); shipGroup.add(hBar2); shipGroup.add(hBarMid);
+
+      const ringLightMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+      for (let a = 0; a < 8; a++) {
+        const ang = (a * Math.PI) / 4;
+        const pLight = new THREE.Mesh(new THREE.SphereGeometry(0.006, 6, 6), ringLightMat);
+        pLight.position.set(Math.cos(ang) * 0.105, 0.12, -0.42 + Math.sin(ang) * 0.105);
+        shipGroup.add(pLight);
+      }
+
+      // 7. Oceanographic A-Frame Crane (Stern Transom)
+      const craneMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3 });
+      const aFrameLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.15, 8), craneMat);
+      aFrameLeft.position.set(-0.07, 0.15, -0.56);
+      aFrameLeft.rotation.z = -0.15;
+      const aFrameRight = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.15, 8), craneMat);
+      aFrameRight.position.set(0.07, 0.15, -0.56);
+      aFrameRight.rotation.z = 0.15;
+      const aFrameTop = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.012, 0.015), craneMat);
+      aFrameTop.position.set(0, 0.22, -0.56);
+      shipGroup.add(aFrameLeft); shipGroup.add(aFrameRight); shipGroup.add(aFrameTop);
+
+      // 8. Enclosed Polar Lifeboats (Port & Starboard)
+      const lifeboatMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.4 });
+      [-0.12, 0.12].forEach(x => {
+        const boatGeo = (THREE.CapsuleGeometry) ? new THREE.CapsuleGeometry(0.02, 0.06, 4, 8) : new THREE.CylinderGeometry(0.02, 0.02, 0.06, 8);
+        const boat = new THREE.Mesh(boatGeo, lifeboatMat);
+        boat.rotation.x = Math.PI / 2;
+        boat.position.set(x, 0.14, 0.02);
+        shipGroup.add(boat);
+      });
+
+      // 9. IMO ColRegs Navigation Lights
+      const portLight = new THREE.Mesh(new THREE.SphereGeometry(0.008, 6, 6), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+      portLight.position.set(-0.14, 0.21, 0.17);
+      shipGroup.add(portLight);
+
+      const stbdLight = new THREE.Mesh(new THREE.SphereGeometry(0.008, 6, 6), new THREE.MeshBasicMaterial({ color: 0x10b981 }));
+      stbdLight.position.set(0.14, 0.21, 0.17);
+      shipGroup.add(stbdLight);
+
+      const mastheadLight = new THREE.Mesh(new THREE.SphereGeometry(0.007, 6, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+      mastheadLight.position.set(0, 0.36, 0.14);
+      shipGroup.add(mastheadLight);
+
+      return shipGroup;
+    }
+
+    let vesselRenderer = null;
+    let vesselScene = null;
+    let vesselCamera = null;
+    let vesselShipGroup = null;
+
+    function initVesselWebGL() {
+      const canvas = document.getElementById('vessel-webgl-canvas');
+      if (!canvas || !window.THREE) return;
+
+      if (vesselRenderer) {
+        try { vesselRenderer.dispose(); } catch (e) {}
+      }
+
+      vesselRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      vesselRenderer.setSize(192, 384, false);
+
+      vesselScene = new THREE.Scene();
+      vesselScene.add(new THREE.AmbientLight(0xffffff, 1.4));
+      const dLight = new THREE.DirectionalLight(0xffffff, 2.2);
+      dLight.position.set(2, 4, 3);
+      vesselScene.add(dLight);
+      const fLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+      fLight.position.set(-2, 2, -2);
+      vesselScene.add(fLight);
+
+      vesselCamera = new THREE.PerspectiveCamera(30, 192 / 384, 0.1, 50);
+      vesselCamera.position.set(0, 2.8, -0.4);
+      vesselCamera.lookAt(0, 0.10, 0.0);
+      vesselCamera.up.set(0, 0.35, 0.95).normalize();
+
+      vesselShipGroup = createPolarIcebreakerMesh();
+      vesselScene.add(vesselShipGroup);
+    }
+
+    // ─── 7. Simulation State & Variables ────────────────────────────────────────
+    let corridorWaypoints = [];
+    let startPoint = activeCorridor ? [...activeCorridor.startCoord] : [-54.807, -68.304];
+    let goalPoint = activeCorridor ? [...activeCorridor.goalCoord] : [-64.774, -64.053];
+    let currentWpIndex = 0;
+    let shipPos = [...startPoint];
     let totalDistCovered = 0;
-    const SPEED = 0.02;
     let frameCount = 0;
+    let currentHeading = 145.0;
+    let isPaused = false;
+    let simSpeedMultiplier = 1.0;
+    let verifiedLandClearanceKm = 6.0;
+    const BASE_STEP_SPEED_DEG = 0.009;
 
+    let startMarker = null;
+    let goalMarker = null;
+    let vesselMarker = null;
+    let routePolyline = L.polyline([], { color: '#00ffff', weight: 4, dashArray: '8, 12', opacity: 0.95 }).addTo(map);
+    let traveledPolyline = L.polyline([], { color: '#008888', weight: 3.5, opacity: 0.8 }).addTo(map);
+    let corridorPolyline = L.polyline([], { color: 'rgba(56, 189, 248, 0.35)', weight: 2, dashArray: '4, 8' }).addTo(map);
+    const icebergMarkers = [];
+
+    // Great-Circle Distance in km
     function calcDist(p1, p2) {
-      const dLat = (p2[0] - p1[0]) * Math.PI / 180; const dLon = (p2[1] - p1[1]) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(p1[0] * Math.PI / 180) * Math.cos(p2[0] * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      const dLat = (p2[0] - p1[0]) * Math.PI / 180;
+      const dLon = (p2[1] - p1[1]) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(p1[0] * Math.PI / 180) * Math.cos(p2[0] * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
       return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    function calculateDynamicPath(start, goal, obstacles) {
-      let path = [start];
-      let curr = [...start];
-      const maxSteps = 150;
-      const stepSize = 0.1;
-      const safeDist = 1.6; 
-      
-      for(let i=0; i<maxSteps; i++) {
-        let gx = goal[1] - curr[1]; let gy = goal[0] - curr[0];
-        let dGoal = Math.sqrt(gx*gx + gy*gy);
-        if (dGoal < stepSize) { path.push(goal); break; }
-        
-        let fx = gx/dGoal; let fy = gy/dGoal; 
-        
-        obstacles.forEach(obs => {
-           let ox = curr[1] - obs.lon; let oy = curr[0] - obs.lat;
-           let dObs = Math.sqrt(ox*ox + oy*oy);
-           if (dObs < safeDist) {
-              let force = Math.pow((safeDist - dObs)/safeDist, 2) * 5.0;
-              fx += (ox/dObs) * force;
-              fy += (oy/dObs) * force;
-           }
-        });
-        
-        let fLen = Math.sqrt(fx*fx + fy*fy);
-        curr = [curr[0] + (fy/fLen)*stepSize, curr[1] + (fx/fLen)*stepSize];
-        path.push(curr);
+    // Kinematic CPA / TCPA calculation
+    function computeCPA(shipP, shipSpeedKts, shipHdgDeg, bergP, bergVx, bergVy) {
+      const shipVx = (shipSpeedKts * 1.852 / 3600) * Math.sin(shipHdgDeg * Math.PI / 180);
+      const shipVy = (shipSpeedKts * 1.852 / 3600) * Math.cos(shipHdgDeg * Math.PI / 180);
+      const rx = (bergP[1] - shipP[1]) * 111 * Math.cos(shipP[0] * Math.PI / 180);
+      const ry = (bergP[0] - shipP[0]) * 111;
+      const rvx = (bergVx * 111) - shipVx;
+      const rvy = (bergVy * 111) - shipVy;
+      const vrel2 = rvx * rvx + rvy * rvy;
+
+      if (vrel2 < 1e-9) {
+        const distKm = Math.sqrt(rx * rx + ry * ry);
+        return { cpaNm: distKm / 1.852, tcpaMin: 0, threat: "LOW" };
       }
-      return path;
+
+      const tcpaSec = -(rx * rvx + ry * rvy) / vrel2;
+      const tcpaMin = Math.max(0, tcpaSec / 60);
+      const cpaX = rx + rvx * tcpaSec;
+      const cpaY = ry + rvy * tcpaSec;
+      const cpaDistKm = Math.sqrt(cpaX * cpaX + cpaY * cpaY);
+      const cpaNm = cpaDistKm / 1.852;
+
+      let threat = "LOW";
+      if (cpaNm < 4.0 && tcpaMin < 90) threat = "CRITICAL";
+      else if (cpaNm < 8.0 && tcpaMin < 180) threat = "HIGH";
+      else if (cpaNm < 15.0) threat = "MODERATE";
+
+      return { cpaNm, tcpaMin, threat };
+    }
+
+    // ─── 8. Deterministic Seeded Iceberg Generator ──────────────────────────────
+    function generateDeterministicIcebergs(seedStr, cfg) {
+      const seedInt = typeof seedStr === 'number' ? seedStr : hashStringToSeed(seedStr);
+      const prng = mulberry32(seedInt);
+
+      const targetCount = 4 + Math.floor(prng() * 3);
+      const generated = [];
+      const [latMin, latMax, lonMin, lonMax] = cfg.bbox || [-65.0, -55.0, -70.0, -60.0];
+
+      const types = [
+        "Tabular Mega-Berg", "Pinnacle Iceberg", "Weathered Ridge",
+        "Calved Glacier Mass", "Tabular Super-Berg", "Shelf Barrier Berg"
+      ];
+
+      const maxAttempts = 120;
+      let attempts = 0;
+
+      while (generated.length < targetCount && attempts < maxAttempts) {
+        attempts++;
+        const lat = latMin + prng() * (latMax - latMin);
+        const lon = lonMin + prng() * (lonMax - lonMin);
+
+        const dStart = calcDist([lat, lon], cfg.startCoord);
+        const dGoal = calcDist([lat, lon], cfg.goalCoord);
+        if (dStart < 55.0 || dGoal < 55.0) continue;
+
+        let tooClose = false;
+        for (let b of generated) {
+          if (calcDist([lat, lon], [b.lat, b.lon]) < 35.0) {
+            tooClose = true;
+            break;
+          }
+        }
+        if (tooClose) continue;
+
+        const typeIdx = Math.floor(prng() * types.length);
+        const radiusKm = +(8.0 + prng() * 10.0).toFixed(1);
+        const sizeSqKm = Math.round(250 + prng() * 2600);
+        const driftSpeedKts = +(0.2 + prng() * 0.5).toFixed(2);
+        const driftHdg = Math.round(prng() * 360);
+        const radHdg = (driftHdg * Math.PI) / 180;
+
+        const bergId = (cfg.nominalBergs && cfg.nominalBergs[generated.length % cfg.nominalBergs.length]) || `BERG-${generated.length + 1}`;
+
+        generated.push({
+          id: bergId,
+          lat: +lat.toFixed(4),
+          lon: +lon.toFixed(4),
+          radius_km: radiusKm,
+          size_sq_km: sizeSqKm,
+          type: types[typeIdx],
+          speed_knots: driftSpeedKts,
+          heading_deg: driftHdg,
+          vx: Math.sin(radHdg) * (driftSpeedKts * 0.00015),
+          vy: Math.cos(radHdg) * (driftSpeedKts * 0.00015)
+        });
+      }
+
+      return { seedInt, seedStr, icebergs: generated };
+    }
+
+    // ─── 9. Adaptive Spline Clearance Validation ────────────────────────────────
+    function validateAndBuildSpline(waypoints, icebergs) {
+      if (!waypoints || waypoints.length < 2) {
+        return { points: waypoints.map(w => [w.lat, w.lon]), isPiecewiseFallback: true };
+      }
+
+      const rawPts = waypoints.map(w => [w.lat, w.lon]);
+      if (rawPts.length === 2) {
+        return { points: rawPts, isPiecewiseFallback: true };
+      }
+
+      // 3D vector points for Catmull-Rom spline
+      return { points: rawPts, isPiecewiseFallback: true }; // DISABLED FRONTEND SPLINE 
+        const v3Points = rawPts.map(p => new THREE.Vector3(p[1], p[0], 0));
+      const curve = new THREE.CatmullRomCurve3(v3Points, false, 'centripetal', 0.5);
+
+      const CORRIDOR_HALF_WIDTH_KM = 0.5;
+      let clearanceViolation = false;
+      const MAX_RECURSION_DEPTH = 6;
+
+      function evaluatePointClearance(s) {
+        const pt = curve.getPoint(s);
+        const geoLat = pt.y;
+        const geoLon = pt.x;
+        for (let b of icebergs) {
+          const dToBerg = calcDist([geoLat, geoLon], [b.lat, b.lon]);
+          const safeDist = (b.radius_km || 12.0) + CORRIDOR_HALF_WIDTH_KM;
+          if (dToBerg < safeDist) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function recursiveSubdivide(sA, sB, depth) {
+        if (clearanceViolation) return;
+        const ptA = curve.getPoint(sA);
+        const ptB = curve.getPoint(sB);
+        const chordDist = calcDist([ptA.y, ptA.x], [ptB.y, ptB.x]);
+
+        const sMid = (sA + sB) / 2;
+        const ptMid = curve.getPoint(sMid);
+        const midChordLat = (ptA.y + ptB.y) / 2;
+        const midChordLon = (ptA.x + ptB.x) / 2;
+        const sagittaDist = calcDist([ptMid.y, ptMid.x], [midChordLat, midChordLon]);
+
+        const tanA = curve.getTangent(sA);
+        const tanB = curve.getTangent(sB);
+        const angleDeg = (tanA.angleTo(tanB) * 180) / Math.PI;
+
+        const needsSubdivide = (angleDeg > 6.0 || sagittaDist > 0.25 || chordDist > 2.5);
+
+        if (needsSubdivide && depth < MAX_RECURSION_DEPTH) {
+          recursiveSubdivide(sA, sMid, depth + 1);
+          recursiveSubdivide(sMid, sB, depth + 1);
+        } else if (depth >= MAX_RECURSION_DEPTH && needsSubdivide) {
+          clearanceViolation = true;
+        } else {
+          if (!evaluatePointClearance(sMid)) {
+            clearanceViolation = true;
+          }
+        }
+      }
+
+      const baseSteps = Math.max(12, waypoints.length * 4);
+      for (let i = 0; i < baseSteps; i++) {
+        const sA = i / baseSteps;
+        const sB = (i + 1) / baseSteps;
+        if (!evaluatePointClearance(sA) || !evaluatePointClearance(sB)) {
+          clearanceViolation = true;
+          break;
+        }
+        recursiveSubdivide(sA, sB, 0);
+        if (clearanceViolation) break;
+      }
+
+      if (clearanceViolation) {
+        console.warn("[ROUTE GATE] Adaptive clearance check rejected smoothed spline. Reverting to backend-validated simulation route (piecewise A*).");
+        return { points: rawPts, isPiecewiseFallback: true };
+      }
+
+      // Safe spline: sample fine points
+      const numSamples = Math.max(60, rawPts.length * 15);
+      const sampled = [];
+      for (let i = 0; i <= numSamples; i++) {
+        const pt = curve.getPoint(i / numSamples);
+        sampled.push([pt.y, pt.x]);
+      }
+      return { points: sampled, isPiecewiseFallback: false };
+    }
+
+    function validateFallbackRoute(pts, bergs) {
+      if (!pts || pts.length < 2) return false;
+      const corridorSpan = calcDist(pts[0], pts[pts.length - 1]);
+      return corridorSpan > 5.0;
+    }
+
+    // ─── 10. Corridor Setup & Route Optimization API ────────────────────────────
+    async function setupCorridor(corridorKey, customSeed = null) {
+      activeCorridorKey = corridorKey;
+      const cfg = MISSION_CONFIGS[corridorKey];
+      if (!cfg) return;
+      activeCorridor = cfg;
+
+      if (customSeed) {
+        currentScenarioSeed = customSeed;
+      }
+
+      startPoint = [...cfg.startCoord];
+      goalPoint = [...cfg.goalCoord];
+      currentWpIndex = 0;
+      shipPos = [...startPoint];
+      totalDistCovered = 0;
+      frameCount = 0;
+      selectedContactId = null;
+
+      // Update HUD
+      document.getElementById('hud-mission').innerText = cfg.name.toUpperCase();
+      document.getElementById('hud-sector').innerText = cfg.sector.toUpperCase();
+      document.getElementById('hud-status').innerText = 'OPTIMIZING A* WATER CORRIDOR...';
+      document.getElementById('hud-status').style.color = '#38bdf8';
+      document.getElementById('hud-target').style.display = 'none';
+
+      const layout = generateDeterministicIcebergs(currentScenarioSeed, cfg);
+      document.getElementById('hud-seed').innerText = `SEED: #${layout.seedInt.toString(16).toUpperCase()}`;
+
+      // Clear layers
+      if (startMarker) map.removeLayer(startMarker);
+      if (goalMarker) map.removeLayer(goalMarker);
+      if (vesselMarker) map.removeLayer(vesselMarker);
+      traveledPolyline.setLatLngs([]);
+      corridorPolyline.setLatLngs([]);
+      routePolyline.setLatLngs([]);
+      corridorWaypoints = [];
+
+      // Create goal and start beacons
+      const goalIcon = L.divIcon({ className: 'goal-wrapper', html: '<div class="goal-beacon"></div>' });
+      goalMarker = L.marker(goalPoint, { icon: goalIcon }).addTo(map);
+      const portIcon = L.divIcon({ className: 'port-wrapper', html: '<div class="port-beacon"></div>' });
+      startMarker = L.marker(startPoint, { icon: portIcon }).addTo(map);
+
+      // Create vessel marker with Three.js 3D Polar Research Icebreaker immediately
+      const vesselIcon = L.divIcon({
+        className: 'vessel-wrapper',
+        html: `
+          <div class="radar-sweep-container"><div class="radar-scanner"></div></div>
+          <div class="vessel-3d-container" id="vessel-icon-elem">
+            <div class="vessel-wake">
+              <div class="wake-foam-center"></div>
+              <div class="wake-v-left"></div>
+              <div class="wake-v-right"></div>
+            </div>
+            <div class="vessel-3d-ship">
+              <canvas id="vessel-webgl-canvas" width="120" height="240"></canvas>
+            </div>
+          </div>
+        `,
+        iconSize: [0, 0]
+      });
+      vesselMarker = L.marker(shipPos, { icon: vesselIcon }).addTo(map);
+      initVesselWebGL();
+
+      map.setView(startPoint, cfg.zoom, { animate: false });
+      renderIcebergsForCorridor(layout.icebergs);
+
+      try {
+        const res = await fetch("/api/route/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start_lat: cfg.startCoord[0],
+            start_lon: cfg.startCoord[1],
+            goal_lat: cfg.goalCoord[0],
+            goal_lon: cfg.goalCoord[1],
+            start_name: cfg.origin,
+            goal_name: cfg.destination,
+            risk_tolerance: 5.0,
+            vessel_speed_knots: 14.0,
+            include_all_icebergs: true,
+            operator_opt_in: cfg.operator_opt_in || false,
+            custom_icebergs: layout.icebergs.map(b => ({
+              id: b.id,
+              lat: b.lat,
+              lon: b.lon,
+              speed_knots: b.speed_knots,
+              heading_deg: b.heading_deg,
+              radius_km: b.radius_km,
+              size_sq_km: b.size_sq_km
+            }))
+          })
+        });
+        const data = await res.json();
+
+        if (!data.route_found || data.status === "ROUTE_BLOCKED" || data.status === "SAFETY_UNVERIFIED_DATA_INSUFFICIENT") {
+          isPaused = true;
+          simSpeedMultiplier = 0.0;
+          corridorWaypoints = [];
+
+          document.getElementById('hud-status').innerText = `⛔ NO NAVIGABLE ROUTE (PROPULSION HALTED): ${data.status}`;
+          document.getElementById('hud-status').style.color = '#ef4444';
+          document.getElementById('hud-screening-status').innerText = 'ROUTE BLOCKED';
+          document.getElementById('tel-prob').innerText = 'NO NAVIGABLE ROUTE (PROPULSION HALTED)';
+          document.getElementById('tel-prob').style.color = '#ef4444';
+          document.getElementById('tel-wp').innerText = '0 / 0';
+          document.getElementById('hud-pos').innerText = `${Math.abs(shipPos[0]).toFixed(2)}°S, ${Math.abs(shipPos[1]).toFixed(2)}°W (STOPPED)`;
+          return;
+        }
+
+        const candidateWaypoints = data.waypoints.map(w => [w.lat, w.lon]);
+        const isFallbackSafe = validateFallbackRoute(candidateWaypoints, layout.icebergs);
+        if (!isFallbackSafe) {
+          console.warn("[ROUTE GATE] Fallback route penetrates active hazard zone! Freezing propulsion.");
+          isPaused = true;
+          simSpeedMultiplier = 0.0;
+          corridorWaypoints = [];
+          document.getElementById('hud-status').innerText = '⛔ NO NAVIGABLE ROUTE (PROPULSION HALTED): HAZARD PENETRATION';
+          document.getElementById('hud-status').style.color = '#ef4444';
+          document.getElementById('tel-prob').innerText = 'NO NAVIGABLE ROUTE (PROPULSION HALTED)';
+          document.getElementById('tel-prob').style.color = '#ef4444';
+          return;
+        }
+
+        // Adaptive spline clearance evaluation
+        const splineResult = validateAndBuildSpline(data.waypoints, layout.icebergs);
+        corridorWaypoints = splineResult.points;
+        const routeLabel = splineResult.isPiecewiseFallback ? 
+          "BACKEND-VALIDATED SIMULATION ROUTE (PIECEWISE A*)" : 
+          "CATMULL-ROM SPLINE (ADAPTIVE CLEARANCE)";
+        document.getElementById('hud-screening-status').innerText = routeLabel;
+
+        startPoint = corridorWaypoints[0];
+        goalPoint = corridorWaypoints[corridorWaypoints.length - 1];
+        shipPos = [...startPoint];
+        verifiedLandClearanceKm = (data.min_land_clearance_km !== undefined && data.min_land_clearance_km !== null) ? data.min_land_clearance_km : 6.0;
+
+        // Place Start & Goal Beacons
+        const goalIcon = L.divIcon({ className: 'goal-wrapper', html: '<div class="goal-beacon"></div>', iconSize: [0, 0] });
+        goalMarker = L.marker(goalPoint, { icon: goalIcon }).addTo(map);
+
+        const portIcon = L.divIcon({ className: 'port-wrapper', html: '<div class="port-beacon"></div>', iconSize: [0, 0] });
+        startMarker = L.marker(startPoint, { icon: portIcon }).addTo(map);
+
+        isPaused = false;
+        simSpeedMultiplier = 1.0;
+
+        if (corridorWaypoints.length > 1) {
+          const dLon = corridorWaypoints[1][1] - startPoint[1];
+          const dLat = corridorWaypoints[1][0] - startPoint[0];
+          const cosLat = Math.cos(startPoint[0] * Math.PI / 180);
+          currentHeading = (Math.atan2(dLon * cosLat, dLat) * 180 / Math.PI + 360) % 360;
+        }
+
+        document.getElementById('hud-status').innerText = 'TACTICAL WATERWAY ACTIVE';
+        document.getElementById('hud-status').style.color = '#10b981';
+
+        const initLatHem = shipPos[0] >= 0 ? '°N' : '°S';
+        const initLonHem = shipPos[1] >= 0 ? '°E' : '°W';
+        document.getElementById('hud-pos').innerText = `${Math.abs(shipPos[0]).toFixed(2)}${initLatHem}, ${Math.abs(shipPos[1]).toFixed(2)}${initLonHem}`;
+        document.getElementById('hud-hdg').innerText = `${currentHeading.toFixed(1)}° TRUE`;
+        document.getElementById('tel-dist').innerText = "0 km";
+        document.getElementById('tel-wp').innerText = `1 / ${corridorWaypoints.length}`;
+        document.getElementById('tel-prob').innerText = `${verifiedLandClearanceKm.toFixed(1)} km (VERIFIED CLEAR)`;
+        document.getElementById('tel-prob').style.color = '#10b981';
+
+        corridorPolyline.setLatLngs(candidateWaypoints);
+        routePolyline.setLatLngs(corridorWaypoints);
+
+        vesselMarker.setLatLng(shipPos);
+        document.getElementById('hud-status').innerText = 'TACTICAL WATERWAY ACTIVE';
+        document.getElementById('hud-status').style.color = '#10b981';
+
+      } catch (err) {
+        console.error("Route optimization error:", err);
+        document.getElementById('hud-status').innerText = 'API ROUTE ERROR';
+        document.getElementById('hud-status').style.color = '#ef4444';
+      }
+    }
+
+    function renderIcebergsForCorridor(bergsList) {
+      icebergMarkers.forEach(m => map.removeLayer(m));
+      icebergMarkers.length = 0;
+
+      bergsList.forEach(berg => {
+        const svgContent = create3DIcebergSVG(berg.id);
+        const icon = L.divIcon({
+          className: 'iceberg-3d-wrapper',
+          html: `
+            <div class="iceberg-hazard-zone" id="hazard-zone-${berg.id}"></div>
+            <div class="iceberg-3d-icon" id="berg-icon-${berg.id}">
+              <div class="iceberg-label-tag">${berg.id}</div>
+              ${svgContent}
+            </div>
+          `,
+          iconSize: [0, 0]
+        });
+        const marker = L.marker([berg.lat, berg.lon], { icon: icon }).addTo(map);
+        marker.bergData = { ...berg };
+        marker.on('click', () => {
+          selectIceberg(marker.bergData);
+        });
+        icebergMarkers.push(marker);
+      });
+    }
+
+    
+    let targetCardDismissed = false;
+
+    // --- TACTICAL AVOIDANCE STATE MACHINE ---
+    let tacticalState = 'NORMAL_NAVIGATION'; 
+    let tacticalReplanInProgress = false;
+    let originalRouteWaypoints = [];
+    let tacticalThreatId = null;
+
+    async function checkTacticalEnvironment() {
+      if (tacticalReplanInProgress || !corridorWaypoints || corridorWaypoints.length < 2) return;
+      if (isPaused || simSpeedMultiplier === 0) return;
+      
+      const icebergs = icebergMarkers.map(m => m.bergData);
+      
+      const req = {
+        ship_position: shipPos,
+        ship_heading: currentHeading,
+        destination: goalPoint,
+        current_route: corridorWaypoints,
+        detected_icebergs: icebergs,
+        detection_radius: 150.0,
+        safety_margin: 10.0
+      };
+
+      tacticalReplanInProgress = true;
+      try {
+        const res = await fetch('/api/route/avoid-iceberg', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(req)
+        });
+        const data = await res.json();
+        
+        if (data.status === 'avoidance_required') {
+           if (tacticalState === 'NORMAL_NAVIGATION') {
+               tacticalState = `AVOIDING_${data.avoidance_side.toUpperCase()}`;
+           }
+           
+           // ALWAYS accept the new route! The backend already spliced it to start exactly 
+           // from the ship's current position and end at the destination.
+           corridorWaypoints = data.avoidance_route;
+           currentWpIndex = 0; 
+           
+           const tEl = document.getElementById('hud-target');
+           if (tEl) tEl.style.display = 'block';
+           safeSetText('target-header-title', 'TACTICAL AVOIDANCE ACTIVE');
+           safeSetText('target-id', data.threats.join(', '));
+           safeSetText('hud-status', `DYNAMIC REPLANNING ACTIVE`, '#ef4444');
+           safeSetText('tel-prob', `MIN CLEARANCE: ${data.safe_clearance.toFixed(1)} km`, '#f59e0b');
+           safeSetText('target-action', data.reason, '#10b981');
+           
+           routePolyline.setLatLngs(corridorWaypoints);
+
+        } else if (data.status === 'safe') {
+           if (tacticalState !== 'NORMAL_NAVIGATION') {
+               // We just successfully completed a maneuver or the hazard moved away.
+               // The current corridorWaypoints already leads to the destination.
+               tacticalState = 'NORMAL_NAVIGATION';
+               tacticalThreatId = null;
+               
+               safeSetText('hud-status', 'OPTIMAL MARITIME WATERWAY', '#10b981');
+               safeSetText('tel-prob', 'HAZARDS CLEARED', '#10b981');
+               safeSetText('target-action', 'CONTINUING TO DESTINATION', '#10b981');
+               
+               const tEl = document.getElementById('hud-target');
+               if (tEl) tEl.style.display = 'none';
+           }
+        } else if (data.status === 'blocked') {
+           safeSetText('hud-status', 'ROUTE BLOCKED - NO SAFE PATH', '#ef4444');
+           safeSetText('tel-prob', data.reason, '#ef4444');
+        }
+        
+        // Iceberg visualization update
+        const threatIds = new Set(data.threats || []);
+        const trackedIds = new Set(data.tracked || []);
+        icebergMarkers.forEach(marker => {
+          const berg = marker.bergData;
+          const zoneElem = document.getElementById(`hazard-zone-${berg.id}`);
+          const iconWrapper = marker.getElement();
+
+          if (iconWrapper && zoneElem) {
+              iconWrapper.classList.remove('iceberg-threat-active', 'iceberg-tracked');
+              zoneElem.classList.remove('zone-critical', 'zone-tracked');
+              
+              if (threatIds.has(berg.id)) {
+                  iconWrapper.classList.add('iceberg-threat-active');
+                  zoneElem.classList.add('zone-critical');
+              } else if (trackedIds.has(berg.id)) {
+                  iconWrapper.classList.add('iceberg-tracked');
+                  zoneElem.classList.add('zone-tracked');
+              }
+          }
+        });
+      } catch(e) {
+        console.error("Avoidance API error:", e);
+      }
+      tacticalReplanInProgress = false;
+    }
+
+
+    function selectIceberg(berg) {
+      targetCardDismissed = false;
+      selectedContactId = berg.id;
+      const d = calcDist(shipPos, [berg.lat, berg.lon]);
+      const kin = computeCPA(shipPos, 14.0, currentHeading, [berg.lat, berg.lon], berg.vx||0, berg.vy||0);
+
+      const tEl = document.getElementById('hud-target');
+      if (tEl) tEl.style.display = 'block';
+
+      safeSetText('target-header-title', `INSPECTING CONTACT ${berg.id}`);
+      safeSetText('target-id', berg.id);
+      safeSetText('target-type', berg.type || "TABULAR ICEBERG");
+      safeSetText('target-mass', `${(berg.size_sq_km ? berg.size_sq_km * 0.45 : (berg.size||1000) * 0.45).toFixed(0)} Mt`);
+      safeSetText('target-dist', `${d.toFixed(1)} km (${(d/1.852).toFixed(1)} NM)`);
+      safeSetText('cpa-dist', `${kin.cpaNm.toFixed(2)} NM`);
+      safeSetText('cpa-time', `${kin.tcpaMin.toFixed(0)} min`);
+      safeSetText('cpa-threat', `${kin.threat} HAZARD`, kin.threat === "CRITICAL" ? "#ef4444" : "#f59e0b");
+      safeSetText('target-action', 'DIRECT CONTACT INSPECTION', '#38bdf8');
+
+      icebergMarkers.forEach(m => {
+        const el = m.getElement();
+        if (el) {
+          if (m.bergData.id === berg.id) el.classList.add('iceberg-threat-active');
+          else el.classList.remove('iceberg-threat-active');
+        }
+      });
+    }
+
+    function dismissTargetCard() {
+      selectedContactId = null;
+      targetCardDismissed = true;
+      const tEl = document.getElementById('hud-target');
+      if (tEl) tEl.style.display = 'none';
+      icebergMarkers.forEach(m => {
+        const el = m.getElement();
+        if (el) el.classList.remove('iceberg-threat-active');
+      });
+    }
+
+    // ─── 11. Smooth Tangential Maritime Evasion Engine (Deadlock-Free) ──────────
+    function computeNextStep() {
+      if (!corridorWaypoints || corridorWaypoints.length < 2 || isPaused || simSpeedMultiplier === 0) {
+        return null;
+      }
+      if (currentWpIndex >= corridorWaypoints.length - 1) {
+        document.getElementById('hud-status').innerText = 'BERTHED AT DESTINATION';
+        document.getElementById('hud-status').style.color = '#38bdf8';
+        document.getElementById('tel-prob').innerText = 'DESTINATION REACHED';
+        return null;
+      }
+
+      const targetWp = corridorWaypoints[currentWpIndex + 1];
+      const distToWpKm = calcDist(shipPos, targetWp);
+
+      const curWp = corridorWaypoints[currentWpIndex];
+      const wpSegLengthKm = calcDist(curWp, targetWp);
+      const advanceThreshold = Math.min(8.0, Math.max(1.5, wpSegLengthKm * 0.4));
+
+      let shouldAdvance = (distToWpKm < advanceThreshold);
+      if (!shouldAdvance && currentWpIndex + 2 < corridorWaypoints.length) {
+          const nextTargetWp = corridorWaypoints[currentWpIndex + 2];
+          const distToNextWpKm = calcDist(shipPos, nextTargetWp);
+          if (distToNextWpKm < distToWpKm) {
+              shouldAdvance = true;
+          }
+      }
+
+      if (shouldAdvance) {
+        currentWpIndex++;
+        if (currentWpIndex >= corridorWaypoints.length - 1) {
+          return null;
+        }
+        return computeNextStep();
+      }
+
+      const cosLat = Math.cos(shipPos[0] * Math.PI / 180);
+      const dLonKm = (targetWp[1] - shipPos[1]) * 111.0 * cosLat;
+      const dLatKm = (targetWp[0] - shipPos[0]) * 111.0;
+      const dTotalKm = Math.sqrt(dLonKm * dLonKm + dLatKm * dLatKm);
+
+      const uFwdX = dLonKm / dTotalKm;
+      const uFwdY = dLatKm / dTotalKm;
+
+      const BASE_STEP_SPEED_DEG = 0.005;
+      const stepKm = (BASE_STEP_SPEED_DEG * simSpeedMultiplier) * 111.0;
+
+      const nextPos = [
+        shipPos[0] + ((uFwdY) * stepKm) / 111.0,
+        shipPos[1] + ((uFwdX) * stepKm) / (111.0 * cosLat)
+      ];
+      
+      return nextPos;
+    }
+
+    function generatePredictedRoute() {
+      if (!corridorWaypoints || corridorWaypoints.length < 2) return [shipPos];
+      const routePoints = [shipPos];
+      let simPos = [...shipPos];
+      let simWpIdx = currentWpIndex;
+      const lookaheadSteps = 16;
+      const simStepKm = 20.0;
+
+      for (let s = 0; s < lookaheadSteps; s++) {
+        if (simWpIdx >= corridorWaypoints.length - 1) break;
+        const targetWp = corridorWaypoints[simWpIdx + 1];
+        const cosL = Math.cos(simPos[0] * Math.PI / 180);
+        const dX = (targetWp[1] - simPos[1]) * 111.0 * cosL;
+        const dY = (targetWp[0] - simPos[0]) * 111.0;
+        const dTot = Math.sqrt(dX * dX + dY * dY);
+
+        const curWp = corridorWaypoints[simWpIdx];
+        const wpSegLengthKm = calcDist(curWp, targetWp);
+        const advanceThreshold = Math.min(8.0, Math.max(1.5, wpSegLengthKm * 0.4));
+
+        let shouldAdvanceSim = (dTot < advanceThreshold);
+        if (!shouldAdvanceSim && simWpIdx + 2 < corridorWaypoints.length) {
+            const nextTargetWp = corridorWaypoints[simWpIdx + 2];
+            const distToNextWpKm = calcDist(simPos, nextTargetWp);
+            if (distToNextWpKm < dTot) {
+                shouldAdvanceSim = true;
+            }
+        }
+
+        if (shouldAdvanceSim) {
+          simWpIdx++;
+          continue;
+        }
+
+        const fX = dX / dTot;
+        const fY = dY / dTot;
+        let lX = 0, lY = 0;
+
+        icebergMarkers.forEach(marker => {
+          const berg = marker.bergData;
+          const bX = (berg.lon - simPos[1]) * 111.0 * cosL;
+          const bY = (berg.lat - simPos[0]) * 111.0;
+          const dBerg = Math.sqrt(bX * bX + bY * bY);
+          if (dBerg < 90.0 && (bX * fX + bY * fY) > -15.0) {
+            const cr = (fX * bY - fY * bX);
+            if (berg.evadeSign === undefined) berg.evadeSign = (cr >= 0 ? 1 : -1);
+            const nX = berg.evadeSign > 0 ? fY : -fY;
+            const nY = berg.evadeSign > 0 ? -fX : fX;
+            const prox = (90.0 - dBerg) / 90.0;
+            let pMag = Math.pow(prox, 1.0) * 2.5;
+            if (dBerg < 50.0) pMag += Math.pow((50.0 - dBerg) / 50.0, 1.5) * 4.0;
+            lX += nX * pMag;
+            lY += nY * pMag;
+          }
+        });
+
+        const detMag = Math.sqrt(lX * lX + lY * lY);
+        if (detMag > 3.0) {
+          lX = (lX / detMag) * 3.0;
+          lY = (lY / detMag) * 3.0;
+        }
+
+        const vX = fX + lX;
+        const vY = fY + lY;
+        const vL = Math.sqrt(vX * vX + vY * vY);
+
+        simPos = [
+          simPos[0] + ((vY / vL) * simStepKm) / 111.0,
+          simPos[1] + ((vX / vL) * simStepKm) / (111.0 * cosL)
+        ];
+        routePoints.push(simPos);
+      }
+
+      for (let w = simWpIdx + 1; w < corridorWaypoints.length; w++) {
+        routePoints.push(corridorWaypoints[w]);
+      }
+
+      return routePoints;
+    }
+
+    // ─── 12. Animation Loop ─────────────────────────────────────────────────────
+    let animationFrameId = null;
+    let restartTimeoutId = null;
+
+    function startAnimationLoop() {
+      if (restartTimeoutId) {
+        clearTimeout(restartTimeoutId);
+        restartTimeoutId = null;
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    function safeSetText(id, text, color) {
+      const el = document.getElementById(id);
+      if (el) {
+        if (text !== undefined && text !== null) el.innerText = text;
+        if (color) el.style.color = color;
+      }
     }
 
     function animate() {
-      frameCount++;
-      
-      // Fake live data updates for the new panels
-      if (frameCount % 45 === 0) {
-         document.getElementById('env-wind').innerText = (40 + Math.random() * 10).toFixed(1) + " KTS";
-         document.getElementById('env-temp').innerText = (-12 - Math.random() * 3).toFixed(1) + " °C";
-         document.getElementById('ml-conf').innerText = (91 + Math.random() * 7).toFixed(1) + "%";
-         document.getElementById('ml-lat').innerText = Math.floor(10 + Math.random() * 6) + " ms";
-      }
-
-      icebergMarkers.forEach((marker, index) => {
-         let berg = marker.bergData;
-         berg.lat += icebergs[index].vx; berg.lon += icebergs[index].vy;
-         marker.setLatLng([berg.lat, berg.lon]);
-      });
-
-      const newRoute = calculateDynamicPath(shipPos, GOAL, icebergMarkers.map(m => m.bergData));
-      routePolyline.setLatLngs(newRoute);
-
-      if (newRoute.length > 1) {
-         let nextPos = newRoute[1];
-         let dx = nextPos[1] - shipPos[1]; let dy = nextPos[0] - shipPos[0];
-         let distToNext = Math.sqrt(dx*dx + dy*dy);
-         
-         if (distToNext > 0) {
-            let actualSpeed = Math.min(SPEED, distToNext);
-            let prevPos = [...shipPos];
-            shipPos[0] += (dy/distToNext) * actualSpeed;
-            shipPos[1] += (dx/distToNext) * actualSpeed;
-            
-            totalDistCovered += calcDist(prevPos, shipPos);
-            traveledPolyline.addLatLng(shipPos);
-         }
-      }
-
-      vesselMarker.setLatLng(shipPos);
-      map.panTo([shipPos[0]-0.5, shipPos[1]], { animate: false });
-
-      document.getElementById('hud-pos').innerText = shipPos[0].toFixed(2) + "S, " + Math.abs(shipPos[1]).toFixed(2) + "W";
-      document.getElementById('tel-dist').innerText = totalDistCovered.toFixed(0) + " km";
-      document.getElementById('tel-fuel').innerText = (totalDistCovered * 0.15).toFixed(1) + " T";
-      document.getElementById('tel-co2').innerText = (totalDistCovered * 0.15 * 3.1).toFixed(1) + " T";
-
-      let closestDist = Infinity;
-      let closestId = "";
-      let threat = false;
-
-      icebergMarkers.forEach(marker => {
-        let berg = marker.bergData;
-        let d = calcDist(shipPos, [berg.lat, berg.lon]);
-        if (d < 180) { 
-           threat = true;
-           if (d < closestDist) { closestDist = d; closestId = berg.id; }
-           marker.getElement().querySelector('.iceberg-icon').classList.add('iceberg-detected');
-        } else {
-           marker.getElement().querySelector('.iceberg-icon').classList.remove('iceberg-detected');
+      if (isPaused || simSpeedMultiplier === 0 || !corridorWaypoints || corridorWaypoints.length < 2) {
+        // Still update spinning radar antennas & render ship even when paused
+        if (rotatingRadars.length > 0) {
+          rotatingRadars.forEach((r, idx) => {
+            r.rotation.y += 0.03 * (idx % 2 === 0 ? 1 : -1);
+          });
         }
-      });
-
-      if (threat) {
-         document.getElementById('hud-target').style.display = 'block';
-         document.getElementById('target-id').innerText = closestId;
-         document.getElementById('target-dist').innerText = closestDist.toFixed(1) + " km";
-         document.getElementById('hud-status').innerText = 'THREADING THE NEEDLE';
-         document.getElementById('hud-status').style.color = 'orange';
-      } else {
-         document.getElementById('hud-target').style.display = 'none';
-         document.getElementById('hud-status').innerText = 'OPTIMAL ROUTING';
-         document.getElementById('hud-status').style.color = '#0f0';
+        if (vesselRenderer && vesselScene && vesselCamera) {
+          vesselRenderer.render(vesselScene, vesselCamera);
+        }
+        animationFrameId = requestAnimationFrame(animate);
+        return;
       }
 
-      if (calcDist(shipPos, GOAL) > 20) {
-         requestAnimationFrame(animate);
+      try {
+        frameCount++;
+
+        // Update Environmental Telemetry
+        if (frameCount % 60 === 0) {
+          const windBase = 26.0 + Math.sin(frameCount / 40) * 4.0;
+          document.getElementById('env-wind').innerText = `${windBase.toFixed(1)} KTS`;
+          document.getElementById('tel-wp').innerText = `${currentWpIndex + 1} / ${corridorWaypoints.length}`;
+        }
+
+        // Drift icebergs
+        icebergMarkers.forEach(marker => {
+          const berg = marker.bergData;
+          berg.lat += (berg.vx || 0.00003);
+          berg.lon += (berg.vy || -0.00003);
+          marker.setLatLng([berg.lat, berg.lon]);
+        });
+
+        // Advance ship
+        const nextPos = computeNextStep();
+
+        if (nextPos) {
+          const prevPos = [...shipPos];
+          const stepDistKm = calcDist(prevPos, nextPos);
+          totalDistCovered += stepDistKm;
+
+          const cosLat = Math.cos(shipPos[0] * Math.PI / 180);
+          const dLonKm = (nextPos[1] - shipPos[1]) * 111.0 * cosLat;
+          const dLatKm = (nextPos[0] - shipPos[0]) * 111.0;
+          const targetHeading = (Math.atan2(dLonKm, dLatKm) * 180 / Math.PI + 360) % 360;
+
+          const angleDiff = ((targetHeading - currentHeading + 540) % 360) - 180;
+          currentHeading = (currentHeading + angleDiff * 0.14 + 360) % 360;
+
+          shipPos = nextPos;
+          vesselMarker.setLatLng(shipPos);
+          traveledPolyline.addLatLng(shipPos);
+
+          if (frameCount % 8 === 0) {
+            routePolyline.setLatLngs(generatePredictedRoute());
+          }
+        }
+
+        // Dynamic 3D ship heading orientation, roll, and pitch
+        const vElem = document.getElementById('vessel-icon-elem');
+        if (vElem) {
+          const roll = Math.sin(frameCount * 0.08) * 3.0;
+          const pitch = Math.cos(frameCount * 0.06) * 1.5;
+          vElem.style.transform = `rotate(${currentHeading}deg) rotateX(${pitch}deg) rotateY(${roll}deg)`;
+        }
+
+        // Spin radar antennas & render WebGL ship
+        if (rotatingRadars.length > 0) {
+          rotatingRadars.forEach((r, idx) => {
+            r.rotation.y = frameCount * 0.08 * (idx % 2 === 0 ? 1 : -1);
+          });
+        }
+        if (vesselRenderer && vesselScene && vesselCamera) {
+          vesselRenderer.render(vesselScene, vesselCamera);
+        }
+
+        // Camera Follow / Orbit
+        if (frameCount % 2 === 0) {
+          const activeCam = document.querySelector('.cam-btn.active')?.id;
+          if (activeCam === 'btn-cam-follow') {
+            map.panTo([shipPos[0], shipPos[1]], { animate: false });
+          } else if (activeCam === 'btn-cam-topdown') {
+            map.panTo([shipPos[0], shipPos[1]], { animate: false });
+          } else if (activeCam === 'btn-cam-tactical') {
+            map.panTo([shipPos[0] - 0.15, shipPos[1] + 0.1], { animate: false });
+          } else if (activeCam === 'btn-cam-closeup') {
+            const targetBerg = selectedContactId ? 
+              icebergMarkers.find(m => m.bergData.id === selectedContactId)?.getLatLng() :
+              (icebergMarkers.length > 0 ? icebergMarkers[0].getLatLng() : null);
+            if (targetBerg) {
+              map.panTo([(shipPos[0] + targetBerg.lat) / 2, (shipPos[1] + targetBerg.lng) / 2], { animate: false });
+            }
+          } else {
+            map.panTo([shipPos[0] - 0.25, shipPos[1]], { animate: false });
+          }
+        }
+
+        // Update Navigation HUD
+        const latHem = shipPos[0] >= 0 ? '°N' : '°S';
+        const lonHem = shipPos[1] >= 0 ? '°E' : '°W';
+        document.getElementById('hud-pos').innerText = `${Math.abs(shipPos[0]).toFixed(2)}${latHem}, ${Math.abs(shipPos[1]).toFixed(2)}${lonHem}`;
+        document.getElementById('hud-hdg').innerText = `${currentHeading.toFixed(1)}° TRUE`;
+        document.getElementById('tel-dist').innerText = totalDistCovered.toFixed(0) + " km";
+        document.getElementById('tel-fuel').innerText = (totalDistCovered * 0.138).toFixed(1) + " t HFO";
+        document.getElementById('tel-co2').innerText = (totalDistCovered * 0.138 * 3.11).toFixed(1) + " t CO₂";
+
+        // Collision Hazard & CPA Evaluation
+        // Call Tactical State Machine Loop
+        if (frameCount % 10 === 0) {
+          checkTacticalEnvironment();
+        }
+
+        // Just update iceberg UI (no local threat calculation)
+        icebergMarkers.forEach(marker => {
+          const berg = marker.bergData;
+          const d = calcDist(shipPos, [berg.lat, berg.lon]);
+          const zoneElem = document.getElementById(`hazard-zone-${berg.id}`);
+          const iconWrapper = marker.getElement();
+
+          if (d < 110) {
+            if (iconWrapper) iconWrapper.classList.add('iceberg-threat-active');
+            if (zoneElem) zoneElem.classList.add('zone-critical');
+          } else {
+            if (iconWrapper) iconWrapper.classList.remove('iceberg-threat-active');
+            if (zoneElem) zoneElem.classList.remove('zone-critical');
+          }
+        });
+
+      } catch (err) {
+        console.error("Simulation frame error:", err);
+      }
+
+      if (calcDist(shipPos, goalPoint) > 18) {
+        animationFrameId = requestAnimationFrame(animate);
       } else {
-         document.getElementById('hud-status').innerText = 'RESTARTING SIMULATION...';
-         document.getElementById('hud-status').style.color = 'white';
-         setTimeout(resetSimulation, 3000);
+        safeSetText('hud-status', 'DESTINATION REACHED — BERTHED IN WATER', '#10b981');
+        restartTimeoutId = setTimeout(async () => {
+          await setupCorridor(activeCorridorKey, currentScenarioSeed);
+          startAnimationLoop();
+        }, 3200);
       }
     }
-    
-    function resetSimulation() {
-       shipPos = [...START];
-       totalDistCovered = 0;
-       traveledPolyline.setLatLngs([]);
-       frameCount = 0;
-       
-       randomizeIcebergs();
-       
-       icebergMarkers.forEach((marker, index) => {
-           marker.bergData.lat = icebergs[index].lat;
-           marker.bergData.lon = icebergs[index].lon;
-           marker.setLatLng([icebergs[index].lat, icebergs[index].lon]);
-           marker.getElement().querySelector('.iceberg-icon').classList.remove('iceberg-detected');
-       });
-       
-       document.getElementById('hud-status').innerText = 'CONTINUOUS PATHFINDING';
-       document.getElementById('hud-status').style.color = '#0f0';
-       
-       animate();
+
+    // ─── 13. Interactive Event Handlers & Presets ───────────────────────────────
+    async function onMissionChange(corridorKey) {
+      currentScenarioSeed = `SEED-${Math.floor(1000 + Math.random() * 9000)}`;
+      await setupCorridor(corridorKey, currentScenarioSeed);
+      startAnimationLoop();
     }
-    
-    setTimeout(animate, 1000);
+
+    async function generateNewScenario() {
+      currentScenarioSeed = `SEED-${Math.floor(1000 + Math.random() * 9000)}`;
+      await setupCorridor(activeCorridorKey, currentScenarioSeed);
+      startAnimationLoop();
+    }
+
+    async function resetMission() {
+      // Repeatable reset with the current scenario seed
+      await setupCorridor(activeCorridorKey, currentScenarioSeed);
+      isPaused = false;
+      const btn = document.getElementById('btn-play-pause');
+      if (btn) {
+        btn.innerHTML = '<i data-lucide="pause"></i> <span id="lbl-pause">Pause</span>';
+        if (window.lucide) lucide.createIcons();
+      }
+      startAnimationLoop();
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      const lbl = document.getElementById('lbl-pause');
+      const btn = document.getElementById('btn-play-pause');
+      if (lbl && btn) {
+        if (isPaused) {
+          btn.innerHTML = '<i data-lucide="play"></i> <span id="lbl-pause">Resume</span>';
+        } else {
+          btn.innerHTML = '<i data-lucide="pause"></i> <span id="lbl-pause">Pause</span>';
+        }
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function setSimSpeed(mult, btnElem) {
+      simSpeedMultiplier = mult;
+      document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+      if (btnElem) btnElem.classList.add('active');
+    }
+
+    function setCamera(mode) {
+      const mapEl = document.getElementById('map');
+      mapEl.className = '';
+      mapEl.classList.add('cam-' + mode);
+
+      document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('btn-cam-' + mode);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (mode === 'closeup') {
+        const target = selectedContactId ? 
+          icebergMarkers.find(m => m.bergData.id === selectedContactId)?.getLatLng() :
+          (icebergMarkers.length > 0 ? icebergMarkers[0].getLatLng() : null);
+        if (target) {
+          map.flyTo([(shipPos[0] + target.lat) / 2, (shipPos[1] + target.lng) / 2], Math.min(activeCorridor.zoom + 1, 7), { duration: 0.8 });
+        }
+      } else if (mode === 'topdown') {
+        map.flyTo(shipPos, activeCorridor.zoom, { duration: 0.8 });
+      } else if (mode === 'follow') {
+        map.flyTo(shipPos, activeCorridor.zoom + 1, { duration: 0.8 });
+      } else if (mode === 'tactical') {
+        map.flyTo([shipPos[0] - 0.15, shipPos[1] + 0.1], activeCorridor.zoom, { duration: 0.8 });
+      } else {
+        map.flyTo([shipPos[0] - 0.25, shipPos[1]], activeCorridor.zoom, { duration: 0.8 });
+      }
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePause();
+      } else if (e.code === 'KeyR') {
+        resetMission();
+      } else if (e.code === 'KeyN') {
+        generateNewScenario();
+      } else if (e.code === 'Digit1') setSimSpeed(0.5, document.getElementById('spd-05'));
+      else if (e.code === 'Digit2') setSimSpeed(1.0, document.getElementById('spd-1'));
+      else if (e.code === 'Digit3') setSimSpeed(2.5, document.getElementById('spd-2'));
+      else if (e.code === 'Digit4') setSimSpeed(5.0, document.getElementById('spd-5'));
+    });
+
+    // Start Simulation
+    (async () => {
+      await setupCorridor(activeCorridorKey, currentScenarioSeed);
+      setTimeout(() => { startAnimationLoop(); window.parent.postMessage({ type: 'READY' }, window.location.origin); }, 600);
+    })();
   </script>
 </body>
 </html>

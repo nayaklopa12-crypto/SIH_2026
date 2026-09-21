@@ -1,0 +1,35 @@
+{
+    "sea_ice_concentration": {
+        "source": "NOAA/NSIDC",
+        "url": "https://nsidc.org/data/g02202/versions/6",
+        "description": "Daily spatial grids of sea-ice concentration for forecasting."
+    },
+    "iceberg_tracking": {
+        "source": "BYU/NIC",
+        "url": "https://www.scp.byu.edu/iceberg/default.html",
+        "description": "Historical iceberg trajectory and size data."
+    },
+    "iceberg_sar": {
+        "source": "Copernicus Sentinel-1 SAR",
+        "url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-1",
+        "description": "High-resolution synthetic aperture radar imagery."
+    },
+    "environmental_forcings": {
+        "source": "Copernicus Marine & ECMWF ERA5",
+        "urls": [
+            "https://data.marine.copernicus.eu/products",
+            "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels"
+        ],
+        "description": "Ocean currents, wind, and temperatures."
+    },
+    "localized_operations": {
+        "source": "NCPOR NPDC",
+        "url": "https://npdc.ncpor.res.in/npdc/homepage.action",
+        "description": "Indian polar datasets for Bharati and Maitri."
+    },
+    "model_benchmarking": {
+        "source": "AI4Arctic / IceBench",
+        "url": "https://data.dtu.dk/collections/AI4Arctic_Sea_Ice_Challenge_Dataset/6244065",
+        "description": "Standardized deep learning sea-ice classification dataset."
+    }
+}

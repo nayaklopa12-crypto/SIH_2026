@@ -1,0 +1,48 @@
+{
+  "interaction": {
+    "discovered": 0,
+    "tested": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "first_load": {
+    "attempts": 0,
+    "passed": 0,
+    "failed": 0,
+    "blank": 0
+  },
+  "iframe": {
+    "tests": []
+  },
+  "autonomous": {
+    "scenarios": 10,
+    "passed": 9,
+    "failed": 1,
+    "blocked": 1,
+    "oscillations": 0,
+    "violations": 0,
+    "collisions": 138
+  },
+  "clearance": {
+    "required": 12.0,
+    "min_observed": -1682.2766235228314,
+    "margin": Infinity
+  },
+  "api": {
+    "scenarios": 0,
+    "handled": 0,
+    "unhandled": 0
+  },
+  "errors": {
+    "console": 56,
+    "page": 0,
+    "request": 0,
+    "http4xx": 0,
+    "http5xx": 28
+  },
+  "backend": {
+    "unittest": "PASS",
+    "pytest": "NOT VERIFIED - pytest not installed"
+  }
+}

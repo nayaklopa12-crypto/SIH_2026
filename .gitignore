@@ -1,0 +1,43 @@
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+**/venv/
+**/.venv/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*.class
+*.pyc
+.pytest_cache/
+**/.pytest_cache/
+**/__pycache__/
+
+# Node modules & builds
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Databases & Large Binaries
+*.db
+*.sqlite
+*.sqlite3
+out/
+**/out/
+*.tsbuildinfo
+**/*.tsbuildinfo
+.env.local
+**/.env.local
+
+# System & IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,47 @@
+{
+  "datasets": [
+    {
+      "name": "Natural Earth 1:50m Land Polygons",
+      "filename": "ne_50m_antarctic_land.json",
+      "provider": "Natural Earth Vector (Public Domain, supported by NACIS & USGS)",
+      "version": "v5.1.1",
+      "release_date": "2023",
+      "nominal_scale": "1:50,000,000",
+      "native_crs": "EPSG:4326 (WGS84)",
+      "geographic_coverage": "Southern Hemisphere (south of -30 deg latitude), encompassing circum-Antarctic landmass, Antarctic Peninsula, South Shetland Islands, South Orkney, South Georgia, Tierra del Fuego, Southern Africa, and Tasmania.",
+      "intended_use": "Broad regional exclusion screening only. Identifies continental landmasses and major islands.",
+      "limitations": "Highly generalized at 1:50m scale (approx. 5-10 km coastal resolution). Omits rocks, islets, and reefs under 5 km in size. Smooths complex fjords and narrow sounds. DOES NOT PROVE NAVIGABLE WATER OR VESSEL CLEARANCE AT TACTICAL SCALE. Coastal navigation within 25 km requires high-resolution charting (e.g. SCAR ADD v7.7 / UKHO)."
+    },
+    {
+      "name": "Natural Earth 1:50m Antarctic Ice Shelves",
+      "filename": "ne_50m_antarctic_ice_shelves.json",
+      "provider": "Natural Earth Vector (derived from SCAR Antarctic Digital Database & USGS)",
+      "version": "v5.1.1",
+      "release_date": "2023",
+      "nominal_scale": "1:50,000,000",
+      "native_crs": "EPSG:4326 (WGS84)",
+      "geographic_coverage": "Circum-Antarctic ice shelf polygons (Ross, Ronne-Filchner, Amery, Larsen C, Fimbul, Riiser-Larsen, Shackleton, West, etc.).",
+      "intended_use": "Coarse barrier screening against major permanent ice shelves.",
+      "limitations": "Static polygons representing multi-year average boundaries. Calving fronts advance and retreat dynamically by several kilometers annually. Does not represent seasonal fast ice, tide cracks, or dynamic iceberg calving margins."
+    },
+    {
+      "name": "BYU/NIC Antarctic Iceberg Database",
+      "filename": "../antarctic_icebergs.db",
+      "provider": "Brigham Young University (BYU) Center for Remote Sensing / National Ice Center (NIC)",
+      "version": "v7.1/v8.0 canonical + near-real-time ASCAT/OSCAT sync",
+      "release_date": "1976-Present",
+      "native_crs": "EPSG:4326 (WGS84)",
+      "geographic_coverage": "Southern Ocean (50S to 78S)",
+      "intended_use": "Dynamic collision hazard screening against major tracked tabular icebergs (>= 10 NM / 18.5 km length).",
+      "limitations": "Does not track bergy bits, growlers (< 5 km), or radar-stealthy ice fragments. Positions older than 48 hours without satellite refresh are considered stale."
+    },
+    {
+      "name": "Bathymetry & Water Depth",
+      "filename": null,
+      "provider": null,
+      "status": "UNVERIFIED_NOT_MODELED",
+      "intended_use": null,
+      "limitations": "Water depth and under-keel clearance (UKC) are NOT modeled by this system. Charted shallows, grounding lines, and submerged pinnacles must be independently verified using official Hydrographic Office navigational charts."
+    }
+  ]
+}

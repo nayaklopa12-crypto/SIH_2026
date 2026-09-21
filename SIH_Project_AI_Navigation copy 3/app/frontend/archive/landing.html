@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antarctic AI Navigation Intelligence — Caffeine Geeks | SIH 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Three.js (r128) - optional runtime dependency for 3D globe & ice glint; fails gracefully to static SVG if offline or unavailable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+/* =========================================================================
+   Global & Preserved Header/Footer Styles
+   Retains the working desktop and mobile behavior of .site-header & .site-footer
+   ========================================================================= */
+:root {
+  --bg: #060b10;
+  --bg-panel: #0e1b26;
+  --bg-raised: #16242e;
+  --ice: #eaf2f5;
+  --ice-muted: rgba(234, 242, 245, 0.65);
+  --accent: #5fd3e3;
+  --accent-dim: #3a8b96;
+  --flare: #e2a65c;
+  --line: #22343f;
+  --btn-radius: 4px;
+  --badge-radius: 9999px;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ice);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.55;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent-dim); color: var(--bg); }
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Preserved Site Header ---------- */
+.site-header {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 0.9rem clamp(1rem, 4vw, 2.5rem);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(6, 11, 16, 0.85);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 0.65rem; }
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--ice);
+}
+
+.badge-pill {
+  background: rgba(95, 211, 227, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(95, 211, 227, 0.35);
+  border-radius: var(--badge-radius);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.88rem;
+  color: var(--ice-muted);
+  transition: color 0.15s ease;
+  position: relative;
+  padding: 4px 0;
+}
+
+.nav-links a:hover { color: var(--ice); }
+.nav-links a:not(.btn)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -2px;
+  height: 1px;
+  background: var(--accent);
+  transition: right 0.2s ease;
+}
+.nav-links a:not(.btn):hover::after { right: 0; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: var(--btn-radius);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.6rem 1.15rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn-primary {
+  background: var(--flare);
+  color: #1a1004;
+}
+.btn-primary:hover { background: #eeb673; }
+.btn-outline {
+  background: transparent;
+  color: var(--ice);
+  border-color: var(--line);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-pill { border-radius: 4px; }
+
+@media(max-width: 860px) {
+  .nav-links a:not(.btn) { display: none; }
+}
+
+/* ---------- Preserved Site Footer ---------- */
+.site-footer {
+  background: #04080d;
+  padding: 3.5rem clamp(1rem, 4vw, 2.5rem) 2.5rem;
+  border-top: 1px solid var(--line);
+  position: relative;
+  z-index: 10;
+}
+
+.footer-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-team .name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--ice);
+}
+
+.footer-team .ps {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--ice-muted);
+  font-size: 0.88rem;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover { color: var(--accent); }
+
+.footer-note {
+  max-width: 1200px;
+  margin: 2.2rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(34, 52, 63, 0.6);
+  text-align: left;
+  color: #5c7481;
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+}
+
+/* =========================================================================
+   NavIce-Antarctica — Scoped Landing Page Styles (.aiv-landing)
+   Isolated styles preventing collisions with app global CSS
+   ========================================================================= */
+.aiv-landing {
+  --void: #060b10;
+  --panel: #0e1b26;
+  --raised: #16242e;
+  --line: #22343f;
+  --ink: #eaf2f5;
+  --ink-muted: #8ca3ae;
+  --ink-faint: #5c7481;
+  --glacial: #5fd3e3;
+  --glacial-dim: #3a8b96;
+  --flare: #e2a65c;
+  --flare-dim: #a8763b;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --maxw: 1200px;
+
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.aiv-landing * { box-sizing: border-box; }
+.aiv-landing img, .aiv-landing svg { max-width: 100%; display: block; }
+.aiv-landing a { color: inherit; text-decoration: none; }
+
+.aiv-container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---------- Hero ---------- */
+.aiv-hero {
+  position: relative;
+  min-height: 94vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: radial-gradient(circle at 75% 50%, rgba(14, 33, 49, 0.4) 0%, transparent 60%), linear-gradient(180deg, #060b10 0%, #0a1620 45%, #0e1e29 100%);
+  padding-top: 72px;
+}
+
+.aiv-hero__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aiv-hero__scene svg { width: 100%; height: 100%; }
+.aiv-hero__scene canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.aiv-hero__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(6,11,16,0.1) 0%, rgba(6,11,16,0) 40%, rgba(6,11,16,0.85) 96%),
+    linear-gradient(90deg, rgba(6,11,16,0.42) 0%, rgba(6,11,16,0) 40%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.aiv-hero__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 80px 32px;
+}
+
+.aiv-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: 28px;
+}
+
+.aiv-hero__globe {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-width: 530px;
+  width: 100%;
+  justify-self: center;
+  cursor: grab;
+}
+
+.aiv-hero__globe:active {
+  cursor: grabbing;
+}
+
+.aiv-hero__globe canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  filter: drop-shadow(0 0 45px rgba(95, 211, 227, 0.18));
+}
+
+.aiv-globe-hud {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  background: rgba(6, 14, 22, 0.8);
+  border: 1px solid rgba(95, 211, 227, 0.35);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--glacial);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aiv-globe-hud::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5fd3e3;
+  box-shadow: 0 0 8px #5fd3e3;
+  animation: aiv-blink 2s infinite;
+}
+
+@keyframes aiv-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.aiv-hero__globe-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.aiv-hero__globe-fallback svg { width: 100%; height: 100%; }
+
+.aiv-hero__globe.is-fallback .aiv-hero__globe-fallback { display: block; }
+.aiv-hero__globe.is-fallback canvas { display: none !important; }
+.aiv-hero__globe.is-fallback .aiv-globe-hud { display: none; }
+
+.aiv-hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--glacial);
+  letter-spacing: 0.04em;
+  margin: 0 0 18px;
+  text-transform: uppercase;
+}
+
+.aiv-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.3rem, 5.2vw, 4.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  margin: 0 0 22px;
+  max-width: 14ch;
+  color: var(--ink);
+}
+
+.aiv-hero__sub {
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  color: var(--ink-muted);
+  max-width: 48ch;
+  margin: 0 0 34px;
+}
+
+.aiv-hero__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.aiv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 0.94rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.aiv-btn--flare {
+  background: var(--flare);
+  color: #1a1004;
+}
+.aiv-btn--flare:hover { background: #eeb673; transform: translateY(-1px); }
+
+.aiv-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.aiv-btn--ghost:hover { border-color: var(--glacial); color: var(--glacial); }
+
+/* ---------- Section Scaffolding ---------- */
+.aiv-section {
+  padding: 104px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.aiv-section--tight { padding: 72px 0; }
+
+.aiv-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+
+.aiv-section h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  line-height: 1.15;
+  margin: 0 0 18px;
+  max-width: 20ch;
+}
+
+.aiv-section p.aiv-lede {
+  color: var(--ink-muted);
+  font-size: 1.05rem;
+  max-width: 58ch;
+  margin: 0 0 8px;
+}
+
+/* ---------- Intro Strip ---------- */
+.aiv-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.aiv-intro__note {
+  border-left: 2px solid var(--glacial-dim);
+  padding-left: 22px;
+  color: var(--ink-muted);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.aiv-intro__note strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- Sequence Section ---------- */
+.aiv-sequence {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 48px;
+}
+
+.aiv-stage {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 32px;
+  padding: 40px 0;
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+
+.aiv-stage:last-child { border-bottom: 1px solid var(--line); }
+
+.aiv-stage__index {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  padding-top: 6px;
+}
+
+.aiv-stage__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  gap: 40px;
+  align-items: center;
+}
+
+.aiv-stage:nth-child(even) .aiv-stage__body {
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+}
+
+.aiv-stage:nth-child(even) .aiv-stage__text { order: 2; }
+.aiv-stage:nth-child(even) .aiv-stage__visual { order: 1; }
+
+.aiv-stage__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--glacial);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.aiv-stage__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.aiv-stage__desc {
+  color: var(--ink-muted);
+  font-size: 0.98rem;
+  max-width: 48ch;
+  margin: 0;
+}
+
+.aiv-stage__visual {
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.aiv-stage__visual svg { width: 62%; height: 62%; }
+
+/* ---------- Feature Entry Points ---------- */
+.aiv-features {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(2, minmax(160px, auto));
+  gap: 18px;
+  margin-top: 48px;
+}
+
+.aiv-feature {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.aiv-feature:hover {
+  border-color: var(--glacial-dim);
+  background: var(--raised);
+  transform: translateY(-2px);
+}
+
+.aiv-feature--primary {
+  grid-column: span 3;
+  grid-row: span 2;
+}
+
+.aiv-feature--a { grid-column: span 3; }
+.aiv-feature--b { grid-column: span 3; }
+.aiv-feature--c { grid-column: span 6; }
+
+.aiv-feature__tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.aiv-feature__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.aiv-feature--primary .aiv-feature__title { font-size: 1.75rem; }
+
+.aiv-feature__desc {
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  margin: 0 0 18px;
+}
+
+.aiv-feature__go {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  color: var(--glacial);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Data & Credibility Panel ---------- */
+.aiv-credibility {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  margin-top: 48px;
+}
+
+.aiv-data-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.aiv-data-list li {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 0.95rem;
+}
+
+.aiv-data-list li:last-child { border-bottom: 1px solid var(--line); }
+.aiv-data-list span.aiv-data-name { color: var(--ink); font-weight: 500; }
+.aiv-data-list span.aiv-data-detail { color: var(--ink-faint); font-family: var(--font-mono); font-size: 0.84rem; text-align: right; }
+
+.aiv-status-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  padding: 28px;
+}
+
+.aiv-status-panel__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.aiv-status-panel__row:first-child { border-top: none; padding-top: 0; }
+
+.aiv-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.aiv-dot--live { background: var(--glacial); box-shadow: 0 0 8px rgba(95, 211, 227, 0.4); }
+.aiv-dot--demo { background: var(--flare); box-shadow: 0 0 8px rgba(226, 166, 92, 0.3); }
+
+.aiv-status-panel__row h4 {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.aiv-status-panel__row p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.aiv-stack-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.aiv-chip {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  border: 1px solid var(--line);
+  background: rgba(14, 27, 38, 0.6);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Closing CTA ---------- */
+.aiv-closing {
+  text-align: center;
+  padding: 112px 0;
+}
+
+.aiv-closing h2 {
+  max-width: none;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  margin: 0 auto 20px;
+}
+
+.aiv-closing p {
+  color: var(--ink-muted);
+  max-width: 48ch;
+  margin: 0 auto 36px;
+}
+
+.aiv-closing .aiv-hero__actions { justify-content: center; }
+
+/* ---------- Reveal Animations & Motion Handling ---------- */
+.aiv-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.aiv-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aiv-landing * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .aiv-reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* ---------- Responsive Breakpoints ---------- */
+@media (max-width: 980px) {
+  .aiv-container { padding: 0 22px; }
+  .aiv-hero__grid { grid-template-columns: 1fr; text-align: left; }
+  .aiv-hero__globe { max-width: 360px; margin: 16px auto 0; order: 2; }
+  .aiv-hero__text { order: 1; }
+
+  .aiv-intro,
+  .aiv-credibility { grid-template-columns: 1fr; gap: 36px; }
+
+  .aiv-stage__body,
+  .aiv-stage:nth-child(even) .aiv-stage__body {
+    grid-template-columns: 1fr;
+  }
+  .aiv-stage:nth-child(even) .aiv-stage__text,
+  .aiv-stage:nth-child(even) .aiv-stage__visual { order: initial; }
+  .aiv-stage__visual { max-width: 320px; }
+
+  .aiv-features { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+  .aiv-feature--primary,
+  .aiv-feature--a, .aiv-feature--b, .aiv-feature--c { grid-column: span 2; grid-row: auto; }
+}
+
+@media (max-width: 640px) {
+  .aiv-section { padding: 72px 0; }
+  .aiv-hero { min-height: 88vh; }
+  .aiv-hero__content { padding: 48px 20px; }
+  .aiv-hero__globe { max-width: 280px; }
+  .aiv-stage { grid-template-columns: 1fr; gap: 14px; }
+  .aiv-features { grid-template-columns: 1fr; }
+  .aiv-feature--primary, .aiv-feature--a, .aiv-feature--b, .aiv-feature--c { grid-column: span 1; }
+  .footer-row { flex-direction: column; }
+}
+
+@media (min-width: 1440px) {
+  .aiv-container { max-width: 1320px; }
+}
+</style>
+</head>
+<body>
+
+  <!-- ==================================================================
+       PRESERVED NAVBAR (.site-header)
+       Maintains working desktop & mobile layout and links to real routes
+       ================================================================== -->
+  <header class="site-header" role="banner">
+    <div class="brand">
+      <span class="wordmark">Antarctic Navigation Intelligence</span>
+      <span class="badge-pill">SIH26059</span>
+    </div>
+    <nav class="nav-links" aria-label="Primary Navigation">
+      <a href="#pipeline-detail">Pipeline</a>
+      <a href="/dashboard">Mission Control</a>
+      <a href="/radar">3D Radar Sim</a>
+      <a href="/navigator">Navigator AI</a>
+      <a href="#architecture-detail">Architecture</a>
+      <a href="/dashboard" class="btn btn-primary btn-pill">Launch Mission Control</a>
+    </nav>
+  </header>
+
+  <!-- ==================================================================
+       MAIN CONTENT CONTAINER (.aiv-landing)
+       ================================================================== -->
+  <div class="aiv-landing">
+
+    <!-- ================================================================
+         HERO SECTION: Text + 3D Real-Life Earth Globe & Velocity Particles
+         ================================================================ -->
+    <header class="aiv-hero">
+      <div class="aiv-hero__scene" id="aivIceField" aria-hidden="true">
+        <!-- Ambient hyper-reactive fluid ice-glint particle field (Three.js) -->
+      </div>
+      <div class="aiv-hero__vignette"></div>
+
+      <div class="aiv-hero__content">
+        <div class="aiv-container aiv-hero__grid">
+
+          <div class="aiv-hero__text">
+            <p class="aiv-hero__eyebrow">SIH 2026 · Problem Statement 26059</p>
+            <h1>Read the ice before the ship does.</h1>
+            <p class="aiv-hero__sub">
+              NavIce-Antarctica forecasts sea-ice concentration and iceberg drift,
+              turns that into a live hazard picture, and recommends the safer
+              route through it — one coupled pipeline, not three disconnected tools.
+            </p>
+            <div class="aiv-hero__actions">
+              <a class="aiv-btn aiv-btn--flare" href="/dashboard">Launch Mission Control</a>
+              <a class="aiv-btn aiv-btn--ghost" href="#pipeline-detail">See the pipeline</a>
+            </div>
+          </div>
+
+          <div class="aiv-hero__globe" id="aivGlobe" aria-hidden="true">
+            <!-- 3D Real-life Globe with Continents, Oceans, Atmosphere Rim Glow,
+                 Antarctica Ice Cap, Waypoints, and Interactive Drag Controls -->
+            <div class="aiv-globe-hud">
+              <span>ANTARCTICA · REAL-TIME OPERATIONAL PICTURE</span>
+            </div>
+
+            <div class="aiv-hero__globe-fallback">
+              <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="200" r="150" fill="#07131e" stroke="#22343f" stroke-width="1.5"/>
+                <!-- Continents silhouette -->
+                <path d="M140,110 Q190,80 240,105 Q280,140 250,180 Q210,170 170,200 Q130,170 140,110 Z" fill="#142c3d" stroke="#5fd3e3" stroke-width="0.8" opacity="0.8"/>
+                <!-- Antarctica Cap -->
+                <path d="M110,270 Q160,330 250,300 Q280,240 220,230 Q140,220 110,270 Z" fill="#e0f4fc" stroke="#5fd3e3" stroke-width="1.2" opacity="0.9"/>
+                <!-- Shipping Route -->
+                <path d="M120,160 Q160,230 220,250" fill="none" stroke="#5fd3e3" stroke-width="2.2" stroke-dasharray="4 3"/>
+                <circle cx="120" cy="160" r="4.5" fill="#5fd3e3"/>
+                <circle cx="220" cy="250" r="4.5" fill="#e2a65c"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- ================================================================
+         INTRO STRIP: Decision support system
+         ================================================================ -->
+    <section class="aiv-section aiv-section--tight" id="intro">
+      <div class="aiv-container aiv-intro">
+        <div>
+          <p class="aiv-kicker">What this is</p>
+          <h2>A decision-support system for polar route planning, built as one pipeline.</h2>
+          <p class="aiv-lede">
+            Three coupled models take raw satellite and ocean observations and
+            turn them into a single, actionable route recommendation — forecast
+            the ice, predict where the hazards drift, then choose the path that
+            balances safety against fuel and time.
+          </p>
+        </div>
+        <div class="aiv-intro__note">
+          <strong>Built for Smart India Hackathon 2026.</strong> This is a
+          working research prototype, not a certified navigation system. Every
+          capability below is labelled as implemented, simulated, or planned —
+          nothing here claims real-world collision avoidance.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SEQUENCE SECTION: Observe -> Forecast -> Assess Risk -> Plan
+         ================================================================ -->
+    <section class="aiv-section" id="pipeline-detail">
+      <div class="aiv-container">
+        <p class="aiv-kicker">How it works</p>
+        <h2>Observe, forecast, assess, plan.</h2>
+        <p class="aiv-lede">Four stages, each feeding the next.</p>
+
+        <div class="aiv-sequence">
+
+          <div class="aiv-stage">
+            <div class="aiv-stage__index">01</div>
+            <div class="aiv-stage__body">
+              <div class="aiv-stage__text">
+                <p class="aiv-stage__label">Observe</p>
+                <h3 class="aiv-stage__title">Raw polar data, ingested</h3>
+                <p class="aiv-stage__desc">
+                  Passive-microwave imagery, synthetic-aperture radar, ocean
+                  reanalysis, and weather feeds are pulled in and normalized
+                  into a common spatial grid.
+                </p>
+              </div>
+              <div class="aiv-stage__visual">
+                <svg viewBox="0 0 100 100" fill="none"><rect x="10" y="14" width="80" height="58" rx="2" stroke="#3a8b96" stroke-width="1.3"/><path d="M10 48 L30 36 L48 52 L64 30 L90 44" stroke="#5fd3e3" stroke-width="1.4" fill="none"/><circle cx="30" cy="36" r="2" fill="#5fd3e3"/><circle cx="64" cy="30" r="2" fill="#5fd3e3"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="aiv-stage">
+            <div class="aiv-stage__index">02</div>
+            <div class="aiv-stage__body">
+              <div class="aiv-stage__text">
+                <p class="aiv-stage__label">Forecast</p>
+                <h3 class="aiv-stage__title">Sea-ice concentration, ahead of time</h3>
+                <p class="aiv-stage__desc">
+                  A spatio-temporal ConvLSTM model projects sea-ice
+                  concentration forward across the grid, with a confidence
+                  value attached to each forecast.
+                </p>
+              </div>
+              <div class="aiv-stage__visual">
+                <svg viewBox="0 0 100 100" fill="none"><rect x="14" y="60" width="10" height="18" fill="#233a46"/><rect x="30" y="48" width="10" height="30" fill="#3a8b96"/><rect x="46" y="34" width="10" height="44" fill="#5fd3e3"/><rect x="62" y="42" width="10" height="36" fill="#3a8b96"/><rect x="78" y="55" width="10" height="23" fill="#233a46"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="aiv-stage">
+            <div class="aiv-stage__index">03</div>
+            <div class="aiv-stage__body">
+              <div class="aiv-stage__text">
+                <p class="aiv-stage__label">Assess risk</p>
+                <h3 class="aiv-stage__title">Iceberg drift, and where it gets dangerous</h3>
+                <p class="aiv-stage__desc">
+                  A physics model corrected with ML and Kalman filtering
+                  produces a drift cone per iceberg. Combined with sea-ice
+                  forecasts and proximity, this becomes a dynamic risk map.
+                </p>
+              </div>
+              <div class="aiv-stage__visual">
+                <svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="6" fill="#e2a65c"/><path d="M50 50 C58 40 70 34 84 30" stroke="#e2a65c" stroke-width="1.2" fill="none" stroke-dasharray="3 4"/><circle cx="84" cy="30" r="16" fill="#e2a65c" fill-opacity="0.12" stroke="#e2a65c" stroke-opacity="0.5"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="aiv-stage">
+            <div class="aiv-stage__index">04</div>
+            <div class="aiv-stage__body">
+              <div class="aiv-stage__text">
+                <p class="aiv-stage__label">Plan</p>
+                <h3 class="aiv-stage__title">The route that balances risk and cost</h3>
+                <p class="aiv-stage__desc">
+                  A* / Dijkstra search runs over the risk-weighted grid to
+                  recommend the safest route that doesn't burn unnecessary
+                  fuel or time on avoidable detours.
+                </p>
+              </div>
+              <div class="aiv-stage__visual">
+                <svg viewBox="0 0 100 100" fill="none"><path d="M14 80 L34 60 L50 68 L70 38 L88 22" stroke="#5fd3e3" stroke-width="1.6" fill="none"/><circle cx="14" cy="80" r="2.4" fill="#5fd3e3"/><circle cx="88" cy="22" r="2.4" fill="#5fd3e3"/><circle cx="60" cy="50" r="10" fill="#e2a65c" fill-opacity="0.15" stroke="#e2a65c" stroke-opacity="0.5"/></svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         FEATURE ENTRY POINTS
+         ================================================================ -->
+    <section class="aiv-section" id="entry-points">
+      <div class="aiv-container">
+        <p class="aiv-kicker">Go deeper</p>
+        <h2>Every stage of the pipeline, live in its own workspace.</h2>
+
+        <div class="aiv-features">
+          <a class="aiv-feature aiv-feature--primary" href="/dashboard">
+            <div>
+              <p class="aiv-feature__tag">Primary workspace</p>
+              <h3 class="aiv-feature__title">Mission Control</h3>
+              <p class="aiv-feature__desc">
+                The full operating view — hazard map, risk overlays, and route
+                recommendation in one place.
+              </p>
+            </div>
+            <span class="aiv-feature__go">Open Mission Control &#8594;</span>
+          </a>
+
+          <a class="aiv-feature aiv-feature--a" href="#pipeline-detail">
+            <div>
+              <p class="aiv-feature__tag">Data &amp; models</p>
+              <h3 class="aiv-feature__title">Pipeline</h3>
+              <p class="aiv-feature__desc">Inspect the forecasting and prediction stages directly.</p>
+            </div>
+            <span class="aiv-feature__go">Explore Pipeline &#8594;</span>
+          </a>
+
+          <a class="aiv-feature aiv-feature--b" href="/radar">
+            <div>
+              <p class="aiv-feature__tag">Simulation</p>
+              <h3 class="aiv-feature__title">3D Radar Sim</h3>
+              <p class="aiv-feature__desc">A three-dimensional tactical view of tracked hazards around a vessel.</p>
+            </div>
+            <span class="aiv-feature__go">Open 3D Radar Sim &#8594;</span>
+          </a>
+
+          <a class="aiv-feature aiv-feature--c" href="/navigator">
+            <div>
+              <p class="aiv-feature__tag">Assistant</p>
+              <h3 class="aiv-feature__title">Navigator AI</h3>
+              <p class="aiv-feature__desc">Ask questions about current conditions and get a plain-language read on route risk.</p>
+            </div>
+            <span class="aiv-feature__go">Open Navigator AI &#8594;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         DATA & CREDIBILITY PANEL
+         ================================================================ -->
+    <section class="aiv-section" id="architecture-detail">
+      <div class="aiv-container">
+        <p class="aiv-kicker">Data &amp; credibility</p>
+        <h2>What's real, what's a demonstration.</h2>
+
+        <div class="aiv-credibility">
+          <div>
+            <ul class="aiv-data-list">
+              <li><span class="aiv-data-name">Sea-ice imagery</span><span class="aiv-data-detail">AMSR2 / SSMIS</span></li>
+              <li><span class="aiv-data-name">Radar imagery</span><span class="aiv-data-detail">Sentinel-1 SAR</span></li>
+              <li><span class="aiv-data-name">Ocean data</span><span class="aiv-data-detail">NCPOR</span></li>
+              <li><span class="aiv-data-name">Weather</span><span class="aiv-data-detail">Standard forecast feeds</span></li>
+            </ul>
+            <p class="aiv-lede" style="margin-top:20px; font-size:0.92rem;">
+              These are the data sources the pipeline is designed around. This
+              landing page doesn't display live figures for any of them —
+              check Mission Control for current session status.
+            </p>
+          </div>
+
+          <div class="aiv-status-panel">
+            <div class="aiv-status-panel__row">
+              <span class="aiv-dot aiv-dot--live"></span>
+              <div>
+                <h4>Forecasting &amp; risk models</h4>
+                <p>Sea-ice forecasting, iceberg drift, and route optimization run as described above.</p>
+              </div>
+            </div>
+            <div class="aiv-status-panel__row">
+              <span class="aiv-dot aiv-dot--demo"></span>
+              <div>
+                <h4>Hazard map basemap</h4>
+                <p>The interactive map inside Mission Control needs a basemap API key configured to render tiles — treat it as a demonstration environment until that's set, not a live operational map.</p>
+              </div>
+            </div>
+            <div class="aiv-status-panel__row">
+              <span class="aiv-dot aiv-dot--demo"></span>
+              <div>
+                <h4>Safety claims</h4>
+                <p>This system supports route planning. It does not guarantee collision avoidance and has not been certified for real-world navigation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aiv-stack-row" aria-label="Technology stack">
+          <span class="aiv-chip">Python</span>
+          <span class="aiv-chip">PyTorch / TensorFlow</span>
+          <span class="aiv-chip">FastAPI</span>
+          <span class="aiv-chip">PostGIS</span>
+          <span class="aiv-chip">Leaflet / Mapbox</span>
+          <span class="aiv-chip">Docker</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         CLOSING CTA
+         ================================================================ -->
+    <section class="aiv-closing" id="closing-cta">
+      <div class="aiv-container">
+        <p class="aiv-kicker" style="text-align:center;">Ready when you are</p>
+        <h2>Bring up the hazard map and see the recommended route.</h2>
+        <p>Everything above feeds into one workspace — open it directly.</p>
+        <div class="aiv-hero__actions">
+          <a class="aiv-btn aiv-btn--flare" href="/dashboard">Launch Mission Control</a>
+          <a class="aiv-btn aiv-btn--ghost" href="/navigator">Ask Navigator AI</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================================================================
+       PRESERVED FOOTER (.site-footer)
+       ================================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-row">
+      <div class="footer-team">
+        <div class="name">Caffeine Geeks</div>
+        <div class="ps">SIH26059</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer Navigation">
+        <a href="#pipeline-detail">Process</a>
+        <a href="/dashboard">Live Map</a>
+        <a href="#architecture-detail">Architecture</a>
+        <a href="#entry-points">Impact</a>
+      </nav>
+    </div>
+    <p class="footer-note">Smart India Hackathon 2026 — Idea Submission.</p>
+  </footer>
+
+  <!-- ==================================================================
+       SELF-CONTAINED RUNTIME JAVASCRIPT
+       1. Three.js Real-life Globe with Continents, Antarctica Ice Cap,
+          Atmosphere Glow & Interactive Drag Controls
+       2. Hyper-Reactive Ambient Particle Field with Velocity Waves
+       3. Scroll-reveal observer
+       ================================================================== -->
+  <script>
+  (function() {
+    "use strict";
+
+    function checkWebGL() {
+      try {
+        var canvas = document.createElement("canvas");
+        return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+      } catch (e) {
+        return false;
+      }
+    }
+
+    var hasWebGL = checkWebGL();
+    var hasThree = typeof THREE !== "undefined";
+    var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var globeContainer = document.getElementById("aivGlobe");
+    var iceContainer = document.getElementById("aivIceField");
+
+    // ========================================================================
+    // 1. PROCEDURAL CONTINENT TEXTURE GENERATOR (Offline-Resilient CanvasTexture)
+    // ========================================================================
+    function createProceduralEarthCanvas() {
+      var w = 2048, h = 1024;
+      var canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext("2d");
+
+      // Deep ocean background with subtle bathymetric gradient
+      var oceanGrad = ctx.createLinearGradient(0, 0, 0, h);
+      oceanGrad.addColorStop(0.0, "#030c17");
+      oceanGrad.addColorStop(0.3, "#04101d");
+      oceanGrad.addColorStop(0.5, "#061525");
+      oceanGrad.addColorStop(0.7, "#051322");
+      oceanGrad.addColorStop(1.0, "#030c17");
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Spherical coordinate helper (lon, lat -> canvas pixel x, y)
+      function toXY(lon, lat) {
+        var x = ((lon + 180) / 360) * w;
+        var y = ((90 - lat) / 180) * h;
+        return [x, y];
+      }
+
+      function drawLandPolygon(pts, fillStyle, strokeStyle, lineWidth) {
+        if (!pts || pts.length < 3) return;
+        ctx.beginPath();
+        var start = toXY(pts[0][0], pts[0][1]);
+        ctx.moveTo(start[0], start[1]);
+        for (var i = 1; i < pts.length; i++) {
+          var pt = toXY(pts[i][0], pts[i][1]);
+          ctx.lineTo(pt[0], pt[1]);
+        }
+        ctx.closePath();
+        if (fillStyle) {
+          ctx.fillStyle = fillStyle;
+          ctx.fill();
+        }
+        if (strokeStyle) {
+          ctx.strokeStyle = strokeStyle;
+          ctx.lineWidth = lineWidth || 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // Graticule grid lines (equator, tropics, polar circles, meridians)
+      ctx.strokeStyle = "rgba(95, 211, 227, 0.08)";
+      ctx.lineWidth = 1;
+      // Latitudes
+      [-66.5, -23.5, 0, 23.5, 66.5].forEach(function(lat) {
+        var y = ((90 - lat) / 180) * h;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      });
+      // Longitudes
+      for (var lon = -180; lon <= 180; lon += 30) {
+        var x = ((lon + 180) / 360) * w;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+
+      // Tactical land styles
+      var landFill = "#112636";
+      var landGlow = "rgba(95, 211, 227, 0.75)";
+      var iceFill = "#d8f2fb";
+      var iceGlow = "rgba(199, 228, 239, 0.95)";
+
+      // --- 1. SOUTH AMERICA ---
+      var southAmerica = [
+        [-80, 8], [-77, 11], [-72, 12], [-65, 11], [-60, 9], [-55, 5],
+        [-50, 0], [-45, -2], [-37, -5], [-35, -9], [-37, -15], [-40, -22],
+        [-46, -24], [-50, -29], [-53, -34], [-57, -38], [-65, -42], [-67, -48],
+        [-66, -55], [-70, -53], [-74, -50], [-73, -44], [-72, -37], [-71, -30],
+        [-76, -18], [-80, -5], [-81, -2], [-78, 2], [-80, 8]
+      ];
+      drawLandPolygon(southAmerica, landFill, landGlow, 1.8);
+
+      // --- 2. NORTH AMERICA ---
+      var northAmerica = [
+        [-80, 8], [-84, 10], [-90, 14], [-97, 18], [-105, 21], [-110, 24],
+        [-115, 30], [-120, 35], [-124, 42], [-125, 49], [-130, 55], [-140, 60],
+        [-160, 58], [-168, 66], [-160, 71], [-150, 70], [-135, 69], [-120, 69],
+        [-100, 70], [-90, 72], [-80, 68], [-82, 60], [-80, 51], [-70, 44],
+        [-75, 36], [-80, 25], [-82, 23], [-85, 29], [-95, 29], [-97, 25],
+        [-90, 21], [-87, 16], [-83, 10], [-80, 8]
+      ];
+      drawLandPolygon(northAmerica, landFill, landGlow, 1.8);
+
+      // Greenland (Ice sheet)
+      var greenland = [
+        [-45, 60], [-52, 65], [-55, 72], [-45, 78], [-30, 83], [-18, 82],
+        [-20, 75], [-30, 70], [-40, 64], [-45, 60]
+      ];
+      drawLandPolygon(greenland, "#cce8f5", iceGlow, 1.6);
+
+      // --- 3. AFRICA ---
+      var africa = [
+        [-6, 36], [10, 37], [25, 32], [32, 31], [33, 28], [39, 21],
+        [43, 13], [51, 12], [47, 5], [42, -3], [40, -11], [35, -20],
+        [32, -28], [28, -34], [18, -34], [15, -28], [12, -18], [12, -7],
+        [9, 4], [0, 6], [-13, 8], [-17, 15], [-15, 24], [-10, 29], [-6, 36]
+      ];
+      drawLandPolygon(africa, landFill, landGlow, 1.8);
+
+      // Madagascar
+      var madagascar = [[49, -12], [50, -17], [48, -24], [44, -25], [44, -17], [49, -12]];
+      drawLandPolygon(madagascar, landFill, landGlow, 1.4);
+
+      // --- 4. EURASIA (Europe + Asia + India) ---
+      var eurasia = [
+        [-9, 38], [-9, 43], [0, 44], [3, 50], [5, 54], [10, 56], [14, 55],
+        [20, 58], [25, 65], [28, 70], [45, 69], [60, 70], [80, 73], [100, 75],
+        [120, 74], [140, 71], [165, 69], [175, 66], [165, 60], [150, 55],
+        [140, 50], [130, 42], [122, 38], [120, 31], [118, 22], [108, 15],
+        [103, 5], [99, 10], [92, 17], [88, 22], [80, 13], [77, 8],
+        [73, 19], [68, 24], [62, 25], [56, 26], [50, 30], [36, 31],
+        [35, 36], [28, 41], [22, 40], [14, 45], [5, 43], [-4, 37], [-9, 38]
+      ];
+      drawLandPolygon(eurasia, landFill, landGlow, 1.8);
+
+      // British Isles
+      var britain = [[-5, 50], [-3, 55], [-2, 58], [-6, 58], [-5, 54], [-5, 50]];
+      drawLandPolygon(britain, landFill, landGlow, 1.3);
+
+      // Japan
+      var japan = [[130, 32], [136, 35], [141, 38], [143, 44], [140, 40], [134, 34], [130, 32]];
+      drawLandPolygon(japan, landFill, landGlow, 1.4);
+
+      // --- 5. AUSTRALIA & OCEANIA ---
+      var australia = [
+        [114, -22], [120, -18], [131, -12], [136, -12], [142, -10],
+        [146, -17], [152, -26], [153, -32], [149, -38], [140, -38],
+        [135, -34], [128, -32], [116, -34], [113, -27], [114, -22]
+      ];
+      drawLandPolygon(australia, landFill, landGlow, 1.8);
+
+      // New Zealand
+      var nzNorth = [[174, -35], [178, -38], [176, -41], [174, -39], [174, -35]];
+      var nzSouth = [[172, -41], [174, -43], [170, -46], [167, -45], [172, -41]];
+      drawLandPolygon(nzNorth, landFill, landGlow, 1.3);
+      drawLandPolygon(nzSouth, landFill, landGlow, 1.3);
+
+      // --- 6. ANTARCTICA (Highlighted Polar Continent) ---
+      // Realistic high-detail Antarctic perimeter with Antarctic Peninsula, Weddell Sea, and Ross Sea
+      var antarctica = [
+        [-58, -63], [-55, -65], [-45, -70], [-35, -75], [-20, -74], [0, -71],
+        [20, -70], [45, -67], [70, -66], [90, -66], [110, -66], [130, -66],
+        [150, -68], [165, -72], [175, -78], [-170, -78], [-150, -75], [-130, -74],
+        [-110, -73], [-90, -73], [-78, -72], [-70, -67], [-63, -64], [-58, -63]
+      ];
+      // Draw massive polar ice sheet reaching bottom of texture
+      ctx.beginPath();
+      var pStart = toXY(antarctica[0][0], antarctica[0][1]);
+      ctx.moveTo(pStart[0], pStart[1]);
+      for (var i = 1; i < antarctica.length; i++) {
+        var pt = toXY(antarctica[i][0], antarctica[i][1]);
+        ctx.lineTo(pt[0], pt[1]);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fillStyle = iceFill;
+      ctx.fill();
+      ctx.strokeStyle = iceGlow;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Weddell Sea Ice Shelf Shading
+      var weddellShelf = [[-60, -75], [-45, -78], [-30, -77], [-40, -74], [-55, -72], [-60, -75]];
+      drawLandPolygon(weddellShelf, "rgba(95, 211, 227, 0.3)", "#5fd3e3", 1.4);
+
+      return canvas;
+    }
+
+    // ========================================================================
+    // 2. 3D REAL-LIFE GLOBE WITH CONTINENTS, LIGHTING & ORBIT CONTROLS
+    // ========================================================================
+    (function initGlobe() {
+      if (!globeContainer) return;
+
+      if (!hasThree || !hasWebGL || prefersReducedMotion || window.innerWidth < 768) {
+        globeContainer.classList.add("is-fallback");
+        return;
+      }
+
+      var width = globeContainer.clientWidth;
+      var height = globeContainer.clientHeight;
+      if (!width || !height) {
+        globeContainer.classList.add("is-fallback");
+        return;
+      }
+
+      var renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch (e) {
+        globeContainer.classList.add("is-fallback");
+        return;
+      }
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      renderer.setSize(width, height);
+      globeContainer.appendChild(renderer.domElement);
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 50);
+      camera.position.set(0, 0, 3.4);
+
+      // Natural space lighting
+      var ambientLight = new THREE.AmbientLight(0x223545, 1.4);
+      scene.add(ambientLight);
+
+      var sunLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
+      sunLight.position.set(4, 2.5, 3.5);
+      scene.add(sunLight);
+
+      var rimLight = new THREE.DirectionalLight(0x5fd3e3, 0.8);
+      rimLight.position.set(-4, -2, -2);
+      scene.add(rimLight);
+
+      var globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+
+      // Generate procedural continent canvas texture (immediate, zero network dependency)
+      var earthCanvas = createProceduralEarthCanvas();
+      var earthTexture = new THREE.CanvasTexture(earthCanvas);
+      earthTexture.wrapS = THREE.ClampToEdgeWrapping;
+      earthTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+      // Globe sphere with realistic Phong material for ocean specular glint
+      var globeGeo = new THREE.SphereGeometry(1, 64, 48);
+      var globeMat = new THREE.MeshPhongMaterial({
+        map: earthTexture,
+        shininess: 24,
+        specular: new THREE.Color(0x3a8b96),
+        bumpScale: 0.05
+      });
+      var globeMesh = new THREE.Mesh(globeGeo, globeMat);
+      globeGroup.add(globeMesh);
+
+      // Progressive enhancement: Try loading photorealistic Earth texture in background
+      var texLoader = new THREE.TextureLoader();
+      texLoader.crossOrigin = "anonymous";
+      texLoader.load(
+        "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+        function(loadedTex) {
+          loadedTex.wrapS = THREE.ClampToEdgeWrapping;
+          loadedTex.wrapT = THREE.ClampToEdgeWrapping;
+          globeMat.map = loadedTex;
+          globeMat.needsUpdate = true;
+        },
+        undefined,
+        function() {
+          // Fallback safely retained if offline or CDN blocked
+        }
+      );
+
+      // 3D Atmospheric Rim Glow (Fresnel Limb Glow)
+      var atmoGeo = new THREE.SphereGeometry(1.04, 48, 36);
+      var atmoMat = new THREE.ShaderMaterial({
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        vertexShader: [
+          "varying vec3 vNormal;",
+          "void main() {",
+          "  vNormal = normalize(normalMatrix * normal);",
+          "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+          "}"
+        ].join("\n"),
+        fragmentShader: [
+          "varying vec3 vNormal;",
+          "void main() {",
+          "  float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);",
+          "  gl_FragColor = vec4(0.37, 0.82, 0.89, 1.0) * intensity * 0.9;",
+          "}"
+        ].join("\n")
+      });
+      var atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+      scene.add(atmoMesh);
+
+      // Helper: lat/lon to 3D Cartesian coordinates
+      function latLonToVec3(lat, lon, r) {
+        var phi = (90 - lat) * (Math.PI / 180);
+        var theta = (lon + 180) * (Math.PI / 180);
+        return new THREE.Vector3(
+          -r * Math.sin(phi) * Math.cos(theta),
+          r * Math.cos(phi),
+          r * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+
+      // Shipping Resupply Corridor across the Weddell Sea
+      var routeWaypoints = [
+        [-54.8, -68.3],  // Ushuaia / South America
+        [-62.2, -58.9],  // King George Island waypoint
+        [-65.5, -50.0],  // Outer Weddell Sea pack ice
+        [-68.8, -34.0],  // Ice lead corridor
+        [-70.77, 11.73], // Maitri Station (Indian Antarctic Station)
+        [-69.4, 76.19]   // Bharati Station (Larsemann Hills)
+      ];
+
+      var routePoints = [];
+      var nWp = routeWaypoints.length;
+      for (var i = 0; i < nWp; i++) {
+        var tNorm = i / (nWp - 1);
+        var elevate = 1.0 + 0.16 * Math.sin(Math.PI * tNorm);
+        routePoints.push(latLonToVec3(routeWaypoints[i][0], routeWaypoints[i][1], elevate));
+      }
+
+      var routeCurve = new THREE.CatmullRomCurve3(routePoints);
+      var routeTube = new THREE.Mesh(
+        new THREE.TubeGeometry(routeCurve, 90, 0.011, 8, false),
+        new THREE.MeshBasicMaterial({ color: 0x5fd3e3, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending })
+      );
+      globeGroup.add(routeTube);
+
+      // Station Pins
+      var stations = [
+        { name: "Maitri (IN)", lat: -70.77, lon: 11.73, color: 0x5fd3e3 },
+        { name: "Bharati (IN)", lat: -69.4, lon: 76.19, color: 0xe2a65c },
+        { name: "Ushuaia Port", lat: -54.8, lon: -68.3, color: 0x5fd3e3 }
+      ];
+
+      var markerGeo = new THREE.SphereGeometry(0.024, 12, 12);
+      var halos = [];
+      stations.forEach(function(st) {
+        var pos = latLonToVec3(st.lat, st.lon, 1.015);
+        var m = new THREE.Mesh(markerGeo, new THREE.MeshBasicMaterial({ color: st.color }));
+        m.position.copy(pos);
+        globeGroup.add(m);
+
+        var haloMat = new THREE.MeshBasicMaterial({
+          color: st.color,
+          transparent: true,
+          opacity: 0.5,
+          blending: THREE.AdditiveBlending
+        });
+        var halo = new THREE.Mesh(new THREE.SphereGeometry(0.046, 12, 12), haloMat);
+        halo.position.copy(pos);
+        globeGroup.add(halo);
+        halos.push(halo);
+      });
+
+      // Animated Navigation Vessel Beacon
+      var shipMesh = new THREE.Mesh(
+        new THREE.ConeGeometry(0.035, 0.075, 4),
+        new THREE.MeshBasicMaterial({ color: 0xe2a65c })
+      );
+      shipMesh.geometry.rotateX(Math.PI / 2);
+      globeGroup.add(shipMesh);
+
+      var shipPing = new THREE.Mesh(
+        new THREE.RingGeometry(0.015, 0.07, 24),
+        new THREE.MeshBasicMaterial({ color: 0xe2a65c, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
+      );
+      globeGroup.add(shipPing);
+
+      // Position Antarctica directly facing camera
+      globeGroup.rotation.x = Math.PI * 0.42;
+      globeGroup.rotation.y = -0.55;
+
+      // Full interactive mouse/touch drag controls with momentum inertia
+      var isDragging = false;
+      var lastMousePos = { x: 0, y: 0 };
+      var dragVelocity = { x: 0, y: 0 };
+      var baseSpeed = 0.0014;
+
+      function onStart(cx, cy) {
+        isDragging = true;
+        dragVelocity.x = 0;
+        dragVelocity.y = 0;
+        lastMousePos = { x: cx, y: cy };
+      }
+
+      function onMove(cx, cy) {
+        if (!isDragging) return;
+        var dx = cx - lastMousePos.x;
+        var dy = cy - lastMousePos.y;
+
+        globeGroup.rotation.y += dx * 0.0055;
+        globeGroup.rotation.x += dy * 0.0055;
+
+        dragVelocity = { x: dx * 0.0055, y: dy * 0.0055 };
+        lastMousePos = { x: cx, y: cy };
+      }
+
+      function onEnd() {
+        isDragging = false;
+      }
+
+      globeContainer.addEventListener("mousedown", function(e) { onStart(e.clientX, e.clientY); });
+      window.addEventListener("mousemove", function(e) { onMove(e.clientX, e.clientY); });
+      window.addEventListener("mouseup", onEnd);
+
+      globeContainer.addEventListener("touchstart", function(e) {
+        if (e.touches.length === 1) onStart(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("touchmove", function(e) {
+        if (isDragging && e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("touchend", onEnd);
+
+      function onResize() {
+        if (!globeContainer) return;
+        var w = globeContainer.clientWidth;
+        var h = globeContainer.clientHeight;
+        if (!w || !h) return;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener("resize", onResize);
+
+      // Animation Loop
+      function animate(time) {
+        requestAnimationFrame(animate);
+
+        var tSec = time * 0.001;
+
+        if (!isDragging) {
+          dragVelocity.x *= 0.94;
+          dragVelocity.y *= 0.94;
+          globeGroup.rotation.y += baseSpeed + dragVelocity.x;
+          globeGroup.rotation.x += dragVelocity.y;
+        }
+
+        // Vessel progression along corridor
+        var shipProg = (tSec * 0.04) % 1.0;
+        var shipPos = routeCurve.getPointAt(shipProg);
+        var shipTangent = routeCurve.getTangentAt(shipProg);
+        shipMesh.position.copy(shipPos);
+        shipMesh.lookAt(shipPos.clone().add(shipTangent));
+        shipPing.position.copy(shipPos);
+        shipPing.lookAt(shipPos.clone().add(shipPos.clone().normalize()));
+
+        var pingScale = 1.0 + 1.8 * (Math.sin(tSec * 3.5) * 0.5 + 0.5);
+        shipPing.scale.set(pingScale, pingScale, pingScale);
+        shipPing.material.opacity = Math.max(0, 0.85 - (pingScale - 1.0) * 0.45);
+
+        // Station halos pulse
+        halos.forEach(function(h, idx) {
+          var pOffset = Math.sin(tSec * 3.0 + idx * 1.5) * 0.5 + 0.5;
+          h.scale.setScalar(1.0 + 0.35 * pOffset);
+          h.material.opacity = 0.25 + 0.3 * pOffset;
+        });
+
+        renderer.render(scene, camera);
+      }
+      animate(0);
+    })();
+
+    // ========================================================================
+    // 3. HYPER-REACTIVE FLUID VELOCITY PARTICLE FIELD (ice-field.js)
+    // ========================================================================
+    (function initIceField() {
+      if (!iceContainer) return;
+      if (!hasThree || !hasWebGL || prefersReducedMotion || window.innerWidth < 768) {
+        return;
+      }
+
+      var width = iceContainer.clientWidth;
+      var height = iceContainer.clientHeight;
+      if (!width || !height) return;
+
+      function hexToVec3(hex) {
+        var n = parseInt(hex.replace("#", ""), 16);
+        return new THREE.Vector3(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+      }
+
+      var renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+      } catch (e) {
+        return;
+      }
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setSize(width, height);
+      iceContainer.appendChild(renderer.domElement);
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 40);
+      camera.position.set(0, 0, 5);
+
+      var COUNT = 2200;
+      var DEPTH = 18;
+
+      var positions = new Float32Array(COUNT * 3);
+      var palette = new Float32Array(COUNT);
+      var bright = new Float32Array(COUNT);
+      var scales = new Float32Array(COUNT);
+      var phases = new Float32Array(COUNT);
+
+      for (var i = 0; i < COUNT; i++) {
+        var i3 = i * 3;
+        positions[i3] = (Math.random() - 0.5) * 16;
+        positions[i3 + 1] = (Math.random() - 0.5) * 10;
+        positions[i3 + 2] = (Math.random() - 0.5) * DEPTH;
+        palette[i] = Math.floor(Math.random() * 3);
+        bright[i] = 0.65 + Math.random() * 0.55;
+        scales[i] = 0.35 + Math.pow(Math.random(), 1.5) * 2.4;
+        phases[i] = Math.random();
+      }
+
+      var geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute("aPalette", new THREE.Float32BufferAttribute(palette, 1));
+      geometry.setAttribute("aBright", new THREE.Float32BufferAttribute(bright, 1));
+      geometry.setAttribute("aScale", new THREE.Float32BufferAttribute(scales, 1));
+      geometry.setAttribute("aPhase", new THREE.Float32BufferAttribute(phases, 1));
+
+      var uniforms = {
+        uTime: { value: 0 },
+        uSize: { value: 26 },
+        uDrift: { value: 0 },
+        uDepth: { value: DEPTH },
+        uCursor: { value: new THREE.Vector3(0, 0, 10) },
+        uCursorVelocity: { value: new THREE.Vector3(0, 0, 0) },
+        uRepelRadius: { value: 4.5 },
+        uRepelStrength: { value: 1.15 },
+        uActivity: { value: 0 },
+        uOpacity: { value: 0 },
+        uColorA: { value: hexToVec3("#eaf2f5") },
+        uColorB: { value: hexToVec3("#5fd3e3") },
+        uColorC: { value: hexToVec3("#e2a65c") }
+      };
+
+      var material = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: uniforms,
+        vertexShader: [
+          "uniform float uTime;",
+          "uniform float uSize;",
+          "uniform float uDrift;",
+          "uniform float uDepth;",
+          "uniform vec3 uCursor;",
+          "uniform vec3 uCursorVelocity;",
+          "uniform float uRepelRadius;",
+          "uniform float uRepelStrength;",
+          "uniform float uActivity;",
+          "uniform vec3 uColorA;",
+          "uniform vec3 uColorB;",
+          "uniform vec3 uColorC;",
+          "attribute float aScale;",
+          "attribute float aPhase;",
+          "attribute float aPalette;",
+          "attribute float aBright;",
+          "varying vec3 vColor;",
+          "varying float vTwinkle;",
+          "void main() {",
+          "  vec3 pos = position;",
+          "  pos.z = mod(pos.z + uDrift + (uDepth * 0.5), uDepth) - (uDepth * 0.5);",
+          "  float tw = sin(uTime * 1.6 + aPhase * 6.28318);",
+          "  vTwinkle = 0.55 + 0.45 * tw;",
+          "  vec4 modelPosition = modelMatrix * vec4(pos, 1.0);",
+          "  vec3 toParticle = modelPosition.xyz - uCursor;",
+          "  float dist = length(toParticle);",
+          "  float falloff = smoothstep(uRepelRadius, 0.0, dist);",
+          "  vec3 swirl = cross(toParticle, vec3(0.0, 0.0, 1.0)) * 0.65;",
+          "  vec3 wake = (normalize(toParticle + vec3(0.0001)) * 0.8 + swirl * 0.5 + uCursorVelocity * 2.2);",
+          "  modelPosition.xyz += wake * falloff * uRepelStrength * uActivity;",
+          "  vec4 viewPosition = viewMatrix * modelPosition;",
+          "  gl_Position = projectionMatrix * viewPosition;",
+          "  gl_PointSize = uSize * aScale * (1.0 / -viewPosition.z) * (1.0 + falloff * uActivity * 0.8);",
+          "  vec3 base = aPalette < 0.5 ? uColorA : (aPalette < 1.5 ? uColorB : uColorC);",
+          "  vColor = base * aBright;",
+          "}"
+        ].join("\n"),
+        fragmentShader: [
+          "uniform float uOpacity;",
+          "varying vec3 vColor;",
+          "varying float vTwinkle;",
+          "void main() {",
+          "  vec2 uv = gl_PointCoord - 0.5;",
+          "  float d = length(uv);",
+          "  if (d > 0.5) discard;",
+          "  float strength = pow(1.0 - d * 2.0, 3.5);",
+          "  gl_FragColor = vec4(vColor, strength * uOpacity * vTwinkle);",
+          "}"
+        ].join("\n")
+      });
+
+      var points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      var pointerWorld = new THREE.Vector3(0, 0, 10);
+      var prevPointerWorld = new THREE.Vector3(0, 0, 10);
+      var currentVelocity = new THREE.Vector3(0, 0, 0);
+      var pointerActive = false;
+      var pointerActivity = 0;
+      var lastMoveAt = 0;
+
+      // Window-level mouse tracking: responsive everywhere across the screen
+      function onPointerMove(evt) {
+        var rect = iceContainer.getBoundingClientRect();
+        var ndcX = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
+        var ndcY = -((evt.clientY - rect.top) / rect.height) * 2 + 1;
+        var dir = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(camera).sub(camera.position).normalize();
+        var dist = -camera.position.z / dir.z;
+        if (isFinite(dist) && dist > 0) {
+          prevPointerWorld.copy(pointerWorld);
+          pointerWorld.copy(camera.position).add(dir.multiplyScalar(dist));
+          currentVelocity.subVectors(pointerWorld, prevPointerWorld);
+        }
+        pointerActive = true;
+        lastMoveAt = performance.now();
+      }
+
+      function onPointerLeave() {
+        pointerActive = false;
+        currentVelocity.set(0, 0, 0);
+      }
+
+      window.addEventListener("mousemove", onPointerMove, { passive: true });
+      document.addEventListener("mouseleave", onPointerLeave, { passive: true });
+
+      function onResize() {
+        var w = iceContainer.clientWidth;
+        var h = iceContainer.clientHeight;
+        if (!w || !h) return;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener("resize", onResize);
+
+      var DRIFT_SPEED = 0.32;
+      var startTime = performance.now();
+      var lastFrame = startTime;
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+        var dt = Math.min(0.05, (now - lastFrame) / 1000);
+        lastFrame = now;
+
+        var idleSeconds = (now - lastMoveAt) / 1000;
+        var targetActivity = pointerActive && idleSeconds < 2.5 ? 1.0 : 0.0;
+        pointerActivity += (targetActivity - pointerActivity) * 0.09;
+
+        // Smooth velocity attenuation
+        currentVelocity.multiplyScalar(0.91);
+
+        uniforms.uCursor.value.copy(pointerWorld);
+        uniforms.uCursorVelocity.value.copy(currentVelocity);
+        uniforms.uActivity.value = pointerActivity;
+        uniforms.uTime.value = now / 1000;
+        uniforms.uDrift.value += dt * DRIFT_SPEED;
+
+        // Parallax depth follow
+        camera.position.x += (pointerWorld.x * 0.08 - camera.position.x) * 0.04;
+        camera.position.y += (pointerWorld.y * 0.08 - camera.position.y) * 0.04;
+        camera.lookAt(0, 0, 0);
+
+        var fadeIn = Math.min(1, Math.max(0, (now - startTime - 120) / 800));
+        uniforms.uOpacity.value = fadeIn * 0.75;
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+    })();
+
+    // ========================================================================
+    // 4. SCROLL REVEAL OBSERVER (landing.js)
+    // ========================================================================
+    (function initReveal() {
+      if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+        return;
+      }
+
+      var targets = document.querySelectorAll(
+        ".aiv-landing .aiv-stage, .aiv-landing .aiv-feature, .aiv-landing .aiv-credibility"
+      );
+
+      targets.forEach(function(el) {
+        el.classList.add("aiv-reveal");
+      });
+
+      var observer = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      targets.forEach(function(el) {
+        observer.observe(el);
+      });
+    })();
+
+  })();
+  </script>
+</body>
+</html>
